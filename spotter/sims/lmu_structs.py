@@ -414,7 +414,7 @@ class SharedMemoryLayout(SharedBase):
 LAYOUT_SIZE = ctypes.sizeof(SharedMemoryLayout)
 
 
-# --- значения из заголовка -------------------------------------------
+# --- значения из заголовка
 
 class GamePhase:
     BEFORE_SESSION = 0

@@ -33,7 +33,6 @@ class WeatherRule:
         self._current(s, say)
         self._forecast(s, say)
 
-    # ------------------------------------------------------------ сейчас
 
     def _current(self, s, say: Say) -> None:
         w = s.weather
@@ -86,7 +85,6 @@ class WeatherRule:
         elif t > 45:
             say("track_hot")
 
-    # ----------------------------------------------------------- прогноз
 
     def _forecast(self, s, say: Say) -> None:
         if s.weather in WET or not s.forecast:

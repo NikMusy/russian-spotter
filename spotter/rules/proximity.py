@@ -120,7 +120,6 @@ class ProximityRule:
         self._pending_clear_at = None
         self._announced = False
 
-    # ------------------------------------------------------------------
 
     def _detect(self, state: GameState) -> str:
         me_motion = state.my_motion

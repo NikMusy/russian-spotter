@@ -101,7 +101,6 @@ class Player:
         self._thread = threading.Thread(target=self._worker, daemon=True)
         self._thread.start()
 
-    # ------------------------------------------------------------ загрузка
 
     def _resolve(self, phrase_id: str) -> str:
         """Выбирает, что реально прозвучит: мем, мат или обычная фраза."""
@@ -202,11 +201,9 @@ class Player:
         return have, len(BY_ID)
 
     def own_count(self) -> int:
-        """Сколько фраз записано своим голосом."""
         return sum(1 for pid in BY_ID
                    if (self.sounds_dir / f"{pid}.wav").exists())
 
-    # --------------------------------------------------------------- API
 
     def say(self, *phrase_ids: str, priority: int | None = None,
             gap: float = 0.04) -> None:
@@ -250,7 +247,6 @@ class Player:
         except pygame.error:
             pass
 
-    # ------------------------------------------------------------ рабочий
 
     def _worker(self) -> None:
         while not self._stop.is_set():

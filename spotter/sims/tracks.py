@@ -120,7 +120,6 @@ TRACK_INFO: dict[str, tuple[str, str]] = {
 
 
 def title(phrase_id: str) -> str:
-    """Человеческое имя трассы для окна статистики."""
     return TRACK_INFO.get(phrase_id, TRACK_INFO[UNKNOWN])[0]
 
 

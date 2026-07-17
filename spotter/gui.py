@@ -68,7 +68,6 @@ class App(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         self.after(80, self._drain)
 
-    # ------------------------------------------------------------- стиль
 
     def _style(self) -> None:
         s = ttk.Style(self)
@@ -100,7 +99,6 @@ class App(tk.Tk):
         s.map("Flat.TButton", background=[("active", "#2e343d"),
                                           ("disabled", BG_PANEL)])
 
-    # ------------------------------------------------------------ разметка
 
     def _build(self) -> None:
         head = ttk.Frame(self, padding=(16, 14, 16, 8))
@@ -109,7 +107,6 @@ class App(tk.Tk):
         self.bank_lbl = ttk.Label(head, text="", style="Dim.TLabel")
         self.bank_lbl.pack(side="right")
 
-        # --- панель управления
         top = ttk.Frame(self, style="Panel.TFrame", padding=14)
         top.pack(fill="x", padx=16)
 
@@ -141,7 +138,6 @@ class App(tk.Tk):
         self.pack_box.bind("<<ComboboxSelected>>", self._on_pack)
         self.pack_box.current(self._initial_pack())
 
-        # --- кнопки и статус
         row = ttk.Frame(self, padding=(16, 12, 16, 4))
         row.pack(fill="x")
         self.go_btn = ttk.Button(row, text="СТАРТ", style="Go.TButton",
@@ -156,7 +152,6 @@ class App(tk.Tk):
         self.status_lbl = ttk.Label(row, text="остановлен", style="Dim.TLabel")
         self.status_lbl.pack(side="left")
 
-        # --- настройки
         opts = ttk.Frame(self, style="Panel.TFrame", padding=14)
         opts.pack(fill="x", padx=16, pady=(8, 0))
 
@@ -192,7 +187,6 @@ class App(tk.Tk):
         self.vol_lbl.pack(side="left", padx=(10, 0))
         self._on_volume()
 
-        # --- лог
         ttk.Label(self, text="Радио", style="Dim.TLabel").pack(
             anchor="w", padx=18, pady=(14, 4))
         wrap = tk.Frame(self, bg="#3a4049", padx=1, pady=1)
@@ -210,7 +204,6 @@ class App(tk.Tk):
         self.log.tag_configure("miss", foreground=AMBER)
         self.log.tag_configure("sys", foreground=FG_DIM)
 
-        # --- низ
         bottom = ttk.Frame(self, padding=(16, 0, 16, 14))
         bottom.pack(fill="x")
         ttk.Button(bottom, text="Статистика", style="Flat.TButton",
@@ -222,7 +215,6 @@ class App(tk.Tk):
         ttk.Button(bottom, text="Очистить лог", style="Flat.TButton",
                    command=self._clear_log).pack(side="right")
 
-    # -------------------------------------------------------------- утиль
 
     def _sim_label(self, sim: str) -> str:
         tail = "" if sim in SUPPORTED else "   (нет адаптера)"
@@ -293,7 +285,6 @@ class App(tk.Tk):
     def _say(self, text: str, tag: str = "sys") -> None:
         self.messages.put((text, tag))
 
-    # ------------------------------------------------------------ события
 
     def _on_sim(self, _e=None) -> None:
         sim = self._current_sim()
@@ -394,7 +385,6 @@ class App(tk.Tk):
         except OSError as exc:
             self._say(f"Не открыть папку: {exc}", "miss")
 
-    # -------------------------------------------------------- старт/стоп
 
     def _toggle(self) -> None:
         if self.engine is None:
@@ -478,7 +468,6 @@ class App(tk.Tk):
         self.dot.itemconfigure(self._dot_id, fill=color)
         self.status_lbl.configure(text=text)
 
-    # ---------------------------------------------------------- очередь
 
     def _drain(self) -> None:
         """Тянет сообщения из фонового потока в окно."""
@@ -507,7 +496,6 @@ class App(tk.Tk):
         self.log.see("end")
         self.log.configure(state="disabled")
 
-    # ------------------------------------------------------------ выход
 
     def _save_cfg(self) -> None:
         try:

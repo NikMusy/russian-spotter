@@ -61,7 +61,6 @@ class GameState:
             elif isinstance(payload[0], LapData):
                 self.laps = payload
 
-    # ------------------------------------------------------------ игрок
 
     @property
     def me(self) -> LapData | None:

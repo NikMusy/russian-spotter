@@ -115,7 +115,6 @@ class Engine:
         else:
             self._run_udp()
 
-    # ------------------------------------------------------------- F1/UDP
 
     def _run_udp(self) -> None:
         self._sock = self._open()
@@ -135,7 +134,6 @@ class Engine:
 
             self._handle(data)
 
-    # ----------------------------------------------------- LMU/shared mem
 
     def _run_lmu(self) -> None:
         from .sims.lmu import LMUAdapter

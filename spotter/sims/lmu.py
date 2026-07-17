@@ -262,7 +262,6 @@ class LMUAdapter:
             state.update(header, self._damage(tele))
         return True
 
-    # ------------------------------------------------------------------
 
     def _motion(self, v: S.VehicleScoringInfoV01) -> CarMotion:
         # mOri - строки матрицы: world[i] = dot(mOri[i], local).

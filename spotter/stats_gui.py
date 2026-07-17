@@ -75,11 +75,9 @@ class StatsWindow(tk.Toplevel):
         box.pack(side="right")
         box.bind("<<ComboboxSelected>>", lambda e: self.reload())
 
-        # --- плитки итогов
         self.cards = ttk.Frame(self, style="S.TFrame", padding=(16, 0, 16, 8))
         self.cards.pack(fill="x")
 
-        # --- таблица
         wrap = tk.Frame(self, bg="#3a4049", padx=1, pady=1)
         wrap.pack(fill="both", expand=True, padx=16, pady=(6, 8))
         self.canvas = tk.Canvas(wrap, bg=BG_PANEL, highlightthickness=0)
@@ -105,7 +103,6 @@ class StatsWindow(tk.Toplevel):
         except tk.TclError:
             pass
 
-    # ---------------------------------------------------------------- данные
 
     def _selected(self) -> list[history.Entry]:
         entries = history.load(self.path)

@@ -99,7 +99,6 @@ class RecorderApp(tk.Tk):
                     troughcolor=BG_PANEL)
 
     def _build(self) -> None:
-        # --- верх: сим, фильтры, микрофон
         top = ttk.Frame(self, style="Panel.TFrame", padding=12)
         top.pack(fill="x", padx=14, pady=(14, 0))
 
@@ -156,7 +155,6 @@ class RecorderApp(tk.Tk):
         if out_labels:
             self.out_box.current(pos)
 
-        # --- карточка фразы
         card = ttk.Frame(self, style="Panel.TFrame", padding=18)
         card.pack(fill="both", expand=True, padx=14, pady=12)
 
@@ -183,7 +181,6 @@ class RecorderApp(tk.Tk):
                                  font=("Segoe UI Semibold", 9))
         self.have_lbl.pack(side="left", padx=(12, 0))
 
-        # --- запись
         self.rec_btn = ttk.Button(card, text="ЗАПИСАТЬ  (пробел)",
                                   style="Rec.TButton",
                                   command=self._toggle_record)
@@ -194,7 +191,6 @@ class RecorderApp(tk.Tk):
         self.level_lbl = ttk.Label(card, text="", style="DimPanel.TLabel")
         self.level_lbl.pack(anchor="w")
 
-        # --- навигация
         nav = ttk.Frame(card, style="Panel.TFrame")
         nav.pack(anchor="w", pady=(18, 0))
         ttk.Button(nav, text="< Назад", style="Flat.TButton",
@@ -206,7 +202,6 @@ class RecorderApp(tk.Tk):
         ttk.Button(nav, text="Дальше >", style="Flat.TButton",
                    command=lambda: self._go(1)).pack(side="left", padx=8)
 
-        # --- прогресс
         bottom = ttk.Frame(self, padding=(14, 0, 14, 14))
         bottom.pack(fill="x")
         self.bar = ttk.Progressbar(bottom, style="Bar.Horizontal.TProgressbar",
@@ -215,7 +210,6 @@ class RecorderApp(tk.Tk):
         self.prog_lbl = ttk.Label(bottom, text="", style="Dim.TLabel")
         self.prog_lbl.pack(anchor="w", pady=(6, 0))
 
-    # ---------------------------------------------------------------- план
 
     def _sim(self) -> str:
         label = self.sim_var.get()
@@ -291,7 +285,6 @@ class RecorderApp(tk.Tk):
         self.idx = max(0, min(len(self.plan) - 1, self.idx + delta))
         self._show()
 
-    # -------------------------------------------------------------- запись
 
     def _toggle_record(self) -> None:
         if self.rec.active:

@@ -58,9 +58,7 @@ class Phrase:
 
 
 PHRASES: list[Phrase] = [
-    # ==================================================================
     # СПОТТЕР. Коротко, резко. Самое важное - это спасает от аварий.
-    # ==================================================================
     Phrase("car_left", "слева", P_SPOTTER, "spotter", core=True,
            note="резко, отрывисто, одно слово"),
     Phrase("car_right", "справа", P_SPOTTER, "spotter", core=True,
@@ -81,9 +79,7 @@ PHRASES: list[Phrase] = [
     Phrase("contact", "контакт", P_SPOTTER, "spotter",
            hard="какого хуя он творит"),
 
-    # ==================================================================
     # ФЛАГИ
-    # ==================================================================
     Phrase("flag_yellow", "жёлтый флаг", P_URGENT, "flags", core=True),
     Phrase("flag_yellow_sector", "жёлтый флаг в твоём секторе", P_URGENT, "flags", core=True),
     Phrase("flag_double_yellow", "двойной жёлтый, сбрось скорость", P_URGENT, "flags",
@@ -95,9 +91,7 @@ PHRASES: list[Phrase] = [
     Phrase("incident_ahead", "авария впереди", P_URGENT, "flags", core=True,
            hard="авария впереди, блядь, аккуратно"),
 
-    # ==================================================================
     # МАШИНА БЕЗОПАСНОСТИ
-    # ==================================================================
     Phrase("sc_deployed", "машина безопасности на трассе", P_URGENT, "safety_car", core=True),
     Phrase("sc_ending", "сейфти кар уходит в этом круге", P_URGENT, "safety_car"),
     Phrase("vsc_deployed", "виртуальная машина безопасности", P_URGENT, "safety_car", core=True),
@@ -105,9 +99,7 @@ PHRASES: list[Phrase] = [
     Phrase("race_restart", "гонка возобновляется", P_URGENT, "safety_car"),
     Phrase("close_up", "подтягивайся к машине впереди", P_NORMAL, "safety_car"),
 
-    # ==================================================================
     # ПИТ-СТОП
-    # ==================================================================
     Phrase("box_this_lap", "бокс, бокс в этом круге", P_URGENT, "pit", core=True),
     Phrase("box_now", "бокс, бокс, бокс", P_URGENT, "pit", core=True),
     Phrase("stay_out", "остаёшься на трассе", P_NORMAL, "pit"),
@@ -121,9 +113,7 @@ PHRASES: list[Phrase] = [
            hard="превышение в пит-лейн, ну ты дал"),
     Phrase("pit_window_open", "окно пит-стопа открыто", P_NORMAL, "pit"),
 
-    # ==================================================================
     # ПОГОДА. F1 25 отдаёт прогноз, так что это реально работает.
-    # ==================================================================
     Phrase("weather_dry", "трасса сухая", P_NORMAL, "weather", core=True),
     Phrase("weather_rain_starting", "начинается дождь", P_URGENT, "weather", core=True,
            hard="дождь начинается, блядь"),
@@ -149,9 +139,7 @@ PHRASES: list[Phrase] = [
     Phrase("wrong_tyres", "ты не на той резине", P_URGENT, "weather",
            hard="ты на хуй не той резине"),
 
-    # ==================================================================
     # ТРАССА
-    # ==================================================================
     Phrase("track_temp", "температура трассы", P_INFO, "track", core=True,
            note="дальше число и слово градусов"),
     Phrase("air_temp", "температура воздуха", P_INFO, "track", core=True),
@@ -165,9 +153,7 @@ PHRASES: list[Phrase] = [
            hard="лужи на трассе, не наеби нам машину"),
     Phrase("low_grip", "сцепления мало", P_NORMAL, "track"),
 
-    # ==================================================================
     # ПРОГРЕВ ШИН И ТОРМОЗОВ
-    # ==================================================================
     Phrase("warm_tyres", "грей шины", P_NORMAL, "warmup", core=True),
     Phrase("warm_tyres_2", "прогрей резину как следует", P_NORMAL, "warmup", core=True),
     Phrase("weave", "поработай рулём, грей резину", P_NORMAL, "warmup", core=True),
@@ -179,9 +165,7 @@ PHRASES: list[Phrase] = [
     Phrase("brakes_hot", "тормоза перегреваются", P_NORMAL, "warmup", core=True),
     Phrase("out_lap_push", "выездной круг, разогревайся", P_INFO, "warmup"),
 
-    # ==================================================================
     # ШИНЫ
-    # ==================================================================
     Phrase("tyres_overheating", "шины перегреваются", P_NORMAL, "tyres", core=True,
            hard="шины перегреваются нахуй, успокойся"),
     Phrase("tyres_worn", "шины на исходе", P_NORMAL, "tyres", core=True),
@@ -194,9 +178,7 @@ PHRASES: list[Phrase] = [
            note="дальше число и слово процентов"),
     Phrase("graining", "гранулирование резины", P_NORMAL, "tyres"),
 
-    # ==================================================================
     # ТОПЛИВО
-    # ==================================================================
     Phrase("fuel_ok", "по топливу всё хорошо", P_INFO, "fuel", core=True),
     Phrase("fuel_save", "экономь топливо", P_NORMAL, "fuel", core=True),
     Phrase("fuel_critical", "топлива в обрез, сильно экономь", P_URGENT, "fuel", core=True,
@@ -206,9 +188,7 @@ PHRASES: list[Phrase] = [
            note="дальше число и слово кругов"),
     Phrase("laps_word", "кругов", P_NORMAL, "fuel", core=True),
 
-    # ==================================================================
     # ПОВРЕЖДЕНИЯ
-    # ==================================================================
     Phrase("damage_front_wing", "переднее крыло повреждено", P_URGENT, "damage", core=True,
            hard="ты крыло разъебал"),
     Phrase("damage_front_wing_bad", "переднее крыло сильно повреждено, в бокс", P_URGENT, "damage", core=True,
@@ -221,9 +201,7 @@ PHRASES: list[Phrase] = [
     Phrase("check_car", "проверь машину", P_NORMAL, "damage", core=True),
     Phrase("car_ok", "машина цела, продолжай", P_NORMAL, "damage", core=True),
 
-    # ==================================================================
     # ШТРАФЫ
-    # ==================================================================
     Phrase("penalty_5s", "пять секунд штрафа", P_URGENT, "penalties", core=True,
            hard="пять секунд штрафа, блядь"),
     Phrase("penalty_10s", "десять секунд штрафа", P_URGENT, "penalties",
@@ -250,9 +228,7 @@ PHRASES: list[Phrase] = [
     Phrase("penalty_speeding", "штраф за превышение в пит-лейн", P_URGENT,
            "penalties", hard="штраф за превышение, ну куда ты гнал"),
 
-    # ==================================================================
     # ПОЗИЦИЯ. Склейка: "ты" + порядковое.
-    # ==================================================================
     Phrase("you_are", "ты", P_NORMAL, "position", core=True,
            note="склеивается с числом: ты + третий"),
     Phrase("ord_1", "первый", P_NORMAL, "position", core=True),
@@ -280,9 +256,7 @@ PHRASES: list[Phrase] = [
     Phrase("position_lost", "тебя обошли", P_NORMAL, "position", core=True,
            hard="тебя обошли, блядь, соберись"),
 
-    # ==================================================================
     # ЧИСЛА. Нужны для отрывов, температур, процентов, кругов.
-    # ==================================================================
     Phrase("num_0", "ноль", P_NORMAL, "numbers", core=True),
     Phrase("num_1", "один", P_NORMAL, "numbers", core=True),
     Phrase("num_2", "два", P_NORMAL, "numbers", core=True),
@@ -313,9 +287,7 @@ PHRASES: list[Phrase] = [
     Phrase("num_90", "девяносто", P_NORMAL, "numbers", core=True),
     Phrase("num_100", "сто", P_NORMAL, "numbers", core=True),
 
-    # ==================================================================
     # ОТРЫВЫ
-    # ==================================================================
     Phrase("gap_ahead", "до машины впереди", P_NORMAL, "gaps", core=True,
            note="дальше число: до машины впереди + два + и + пять + секунды"),
     Phrase("gap_behind", "преследователь в", P_NORMAL, "gaps", core=True),
@@ -330,9 +302,7 @@ PHRASES: list[Phrase] = [
     Phrase("push_now", "жми, сейчас твой шанс", P_NORMAL, "gaps",
            hard="жми, блядь, давай"),
 
-    # ==================================================================
     # КРУГИ
-    # ==================================================================
     Phrase("last_lap", "последний круг", P_URGENT, "laps", core=True),
     Phrase("laps_remaining", "осталось кругов", P_NORMAL, "laps", core=True),
     Phrase("half_distance", "половина дистанции", P_INFO, "laps"),
@@ -344,9 +314,7 @@ PHRASES: list[Phrase] = [
            hard="круг не засчитан, блядь"),
     Phrase("purple_sector", "фиолетовый сектор", P_INFO, "laps"),
 
-    # ==================================================================
     # DRS. Только там, где он есть.
-    # ==================================================================
     Phrase("drs_enabled", "DRS разрешён", P_NORMAL, "drs", core=True,
            sims=(SIM_F1, SIM_AMS2)),
     Phrase("drs_disabled", "DRS запрещён", P_NORMAL, "drs", core=True,
@@ -354,10 +322,8 @@ PHRASES: list[Phrase] = [
     Phrase("drs_open_it", "открывай DRS", P_NORMAL, "drs",
            sims=(SIM_F1, SIM_AMS2)),
 
-    # ==================================================================
     # ЭНДУРАНС: классы, трафик, смена пилота, ночь.
     # LMU, ACC, iRacing, AMS2.
-    # ==================================================================
     Phrase("traffic_ahead", "трафик впереди", P_NORMAL, "endurance", core=True,
            sims=ENDURANCE),
     Phrase("faster_class_behind", "сзади быстрый класс, пропусти", P_URGENT,
@@ -395,9 +361,7 @@ PHRASES: list[Phrase] = [
     Phrase("save_the_car", "береги машину, гонка длинная", P_INFO,
            "endurance", core=True, sims=ENDURANCE),
 
-    # ==================================================================
     # iRACING: инциденты.
-    # ==================================================================
     Phrase("incident", "инцидент засчитан", P_NORMAL, "iracing", core=True,
            sims=(SIM_IRACING,), hard="инцидент, блядь"),
     Phrase("incident_careful", "аккуратнее, инциденты копятся", P_URGENT,
@@ -405,10 +369,8 @@ PHRASES: list[Phrase] = [
     Phrase("clean_race", "едешь чисто, молодец", P_INFO, "iracing",
            sims=(SIM_IRACING,)),
 
-    # ==================================================================
     # ТРАССЫ. Играет при заходе в сессию: "Ле-Ман. Гонка."
     # Записывай так, как реально называешь их вслух.
-    # ==================================================================
     Phrase("welcome_to", "сегодня едем", P_NORMAL, "tracks", core=True,
            note="дальше подставится трасса и тип сессии"),
 
@@ -463,9 +425,7 @@ PHRASES: list[Phrase] = [
     Phrase("track_unknown", "трасса", P_NORMAL, "tracks", core=True,
            note="запасной вариант, если трассу не узнали"),
 
-    # ==================================================================
     # ТИП СЕССИИ
-    # ==================================================================
     Phrase("session_practice", "свободная практика", P_NORMAL, "session",
            core=True),
     Phrase("session_qualifying", "квалификация", P_NORMAL, "session",
@@ -481,9 +441,7 @@ PHRASES: list[Phrase] = [
            "session", core=True),
     Phrase("practice_relax", "практика, никуда не спеши", P_NORMAL, "session"),
 
-    # ==================================================================
     # КЛАССЫ МАШИН (эндуранс)
-    # ==================================================================
     Phrase("class_hypercar", "гиперкар", P_NORMAL, "classes", core=True,
            sims=(SIM_LMU, SIM_IRACING)),
     Phrase("class_lmp2", "эл эм пэ два", P_NORMAL, "classes", core=True,
@@ -510,10 +468,8 @@ PHRASES: list[Phrase] = [
     Phrase("class_leader", "ты лидер класса", P_NORMAL, "classes",
            core=True, sims=ENDURANCE, hard="ты лидер класса, красава"),
 
-    # ==================================================================
     # МЕМЫ. Играют вместо обычных фраз, изредка. Галка "Мемы" в окне.
     # Записывай с душой, это половина удовольствия.
-    # ==================================================================
     Phrase("meme_verstappen", "тутутуту, Макс Ферстаппен", P_NORMAL, "memes",
            core=True, hard="тутутуту, блядь, Макс Ферстаппен ебаный",
            note="после обгона, тянуче, как из трансляции"),
@@ -562,9 +518,7 @@ PHRASES: list[Phrase] = [
     Phrase("meme_box_meme", "бокс бокс бокс, я сказал", P_NORMAL, "memes",
            core=True, hard="бокс бокс бокс, блядь, я сказал"),
 
-    # ==================================================================
     # ОБЩЕЕ
-    # ==================================================================
     Phrase("radio_check", "связь есть, слышу тебя хорошо", P_NORMAL, "general",
            core=True,
            note="первое, что слышишь при подключении - проверка связи"),

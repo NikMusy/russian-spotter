@@ -118,7 +118,6 @@ def trim_silence(audio: np.ndarray) -> np.ndarray:
 
 
 def normalize(audio: np.ndarray) -> np.ndarray:
-    """Выравнивает громкость по пику."""
     if audio.size == 0:
         return audio
     peak = float(np.abs(audio).max())

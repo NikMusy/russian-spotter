@@ -13,7 +13,6 @@ from dataclasses import dataclass
 
 MAX_CARS = 22
 
-# ---------------------------------------------------------------- header
 
 HEADER_FMT = struct.Struct("<HBBBBBQfIIBB")
 HEADER_SIZE = HEADER_FMT.size  # 29
@@ -82,8 +81,6 @@ def parse_header(data: bytes) -> Header | None:
     return Header(*v)
 
 
-# ---------------------------------------------------------------- motion
-
 # 6 float, 6 int16 (направления), 6 float = 60 байт
 MOTION_FMT = struct.Struct("<6f6h6f")
 
@@ -116,8 +113,6 @@ def parse_motion(data: bytes) -> list[CarMotion]:
         off += MOTION_FMT.size
     return cars
 
-
-# -------------------------------------------------------------- lap data
 
 # 15 однобайтовых полей идут подряд, от m_carPosition до
 # m_pitLaneTimerActive - считать их в строке формата глазами слишком легко
@@ -207,8 +202,6 @@ def parse_lap_data(data: bytes) -> list[LapData]:
     return cars
 
 
-# --------------------------------------------------------- car telemetry
-
 TELEMETRY_FMT = struct.Struct("<HfffBbHBBH4H4B4BH4f4B")  # 60
 
 
@@ -250,8 +243,6 @@ def parse_telemetry(data: bytes, index: int) -> Telemetry:
         surface_type=(sf0, sf1, sf2, sf3),
     )
 
-
-# ------------------------------------------------------------ car status
 
 STATUS_FMT = struct.Struct("<BBBBBfffHHBBHBBBbfffBfffB")  # 55
 
@@ -302,8 +293,6 @@ def parse_car_status(data: bytes, index: int) -> CarStatus:
     )
 
 
-# ------------------------------------------------------------ car damage
-
 # F1 25: 46 байт. Первые 24 (износ + damage шин + тормоза) стабильны,
 # дальше 18 однобайтовых полей навесного и мотора, в конце - блистеры,
 # добавленные в F1 25.
@@ -342,8 +331,6 @@ def parse_car_damage(data: bytes, index: int) -> CarDamage:
         gearbox=gearbox, engine=engine,
     )
 
-
-# --------------------------------------------------------------- session
 
 class SessionType:
     UNKNOWN = 0
@@ -456,9 +443,6 @@ def parse_session(data: bytes) -> SessionInfo | None:
     )
 
 
-# ----------------------------------------------------------------- event
-
-
 @dataclass
 class Event:
     code: str
@@ -470,9 +454,6 @@ def parse_event(data: bytes) -> Event | None:
         return None
     code = data[HEADER_SIZE:HEADER_SIZE + 4].decode("ascii", errors="replace")
     return Event(code=code, raw=data[HEADER_SIZE + 4:])
-
-
-# ------------------------------------------------------------ dispatcher
 
 
 def parse_packet(data: bytes) -> tuple[Header, object] | None:
