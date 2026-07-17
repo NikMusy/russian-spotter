@@ -157,6 +157,8 @@ class LapData:
     penalties: int
     total_warnings: int
     corner_cutting_warnings: int
+    num_unserved_drive_through: int
+    num_unserved_stop_go: int
     grid_position: int
     driver_status: int
     result_status: int
@@ -174,7 +176,7 @@ def parse_lap_data(data: bytes) -> list[LapData]:
          lap_dist, total_dist, sc_delta,
          pos, cur_lap, pit_status, num_stops, sector, invalid,
          penalties, warnings, cc_warnings,
-         _dt_pens, _sg_pens, grid, drv_status, res_status,
+         dt_pens, sg_pens, grid, drv_status, res_status,
          pit_timer_active, _pit_lane_ms, _pit_stop_ms, _serve_pen,
          _trap_speed, _trap_lap) = v
         cars.append(LapData(
@@ -194,6 +196,8 @@ def parse_lap_data(data: bytes) -> list[LapData]:
             penalties=penalties,
             total_warnings=warnings,
             corner_cutting_warnings=cc_warnings,
+            num_unserved_drive_through=dt_pens,
+            num_unserved_stop_go=sg_pens,
             grid_position=grid,
             driver_status=drv_status,
             result_status=res_status,

@@ -45,14 +45,32 @@ class PitLimiterRule:
         self.was_in_pits = in_pits
 
 
+# Про холодные шины напоминаем не больше этого раз за стинт. Если трасса
+# холодная, резина может вообще не догреться до нормы - и без лимита
+# споттер долбил бы одно и то же весь заезд.
+MAX_COLD_CALLS = 2
+COLD_GAP = 50.0
+# Перегрев - вещь временная (пара кругов атаки), но повторять тоже незачем.
+MAX_HOT_CALLS = 3
+HOT_GAP = 45.0
+
+
 class TyreRule:
     def __init__(self) -> None:
         self.cd = Cooldown()
         self.warned_wear: set[int] = set()
         self.last_punctured = False
         self.reported_ready = False
+        self.cold_calls = 0
+        self.hot_calls = 0
+        self.was_in_pits = False
 
     def update(self, state: GameState, say: Say) -> None:
+        # Выехали из пита - новый стинт, шины другие, счётчики обнуляем.
+        if self.was_in_pits and not state.in_pits:
+            self.on_new_tyres()
+        self.was_in_pits = state.in_pits
+
         if not state.on_track or state.in_pits:
             return
 
@@ -75,20 +93,29 @@ class TyreRule:
         avg = sum(temps) / len(temps)
 
         if avg < 70 and state.speed_kmh > 60:
-            if self.cd.ready("cold", 25):
+            if self.cold_calls < MAX_COLD_CALLS and self.cd.ready("cold", COLD_GAP):
+                self.cold_calls += 1
                 say("warm_tyres")
                 self.reported_ready = False
         elif avg > 115:
-            if self.cd.ready("hot", 20):
+            if self.hot_calls < MAX_HOT_CALLS and self.cd.ready("hot", HOT_GAP):
+                self.hot_calls += 1
                 say("tyres_overheating")
         elif 85 <= avg <= 105 and not self.reported_ready:
             if self.cd.ready("ready", 30):
                 say("tyres_ready")
                 self.reported_ready = True
+                # Прогрелись - про холод больше не заикаемся.
+                self.cold_calls = MAX_COLD_CALLS
 
     def on_new_tyres(self) -> None:
         self.warned_wear.clear()
         self.reported_ready = False
+        self.cold_calls = 0
+        self.hot_calls = 0
+        self.cd.reset("cold")
+        self.cd.reset("hot")
+        self.cd.reset("ready")
 
 
 class FuelRule:

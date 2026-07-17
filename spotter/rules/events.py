@@ -25,10 +25,14 @@ E_RACE_WINNER = "RCWN"
 class EventRule:
     """Реагирует на пакеты событий (packet id 3)."""
 
-    def __init__(self) -> None:
+    def __init__(self, penalties: "PenaltyRule | None" = None) -> None:
         self.cd = Cooldown()
+        # Тип штрафа приходит только в событии, поэтому передаём его туда,
+        # где живёт вся логика штрафов.
+        self.penalties = penalties
 
-    def on_event(self, code: str, state: GameState, say: Say) -> None:
+    def on_event(self, code: str, state: GameState, say: Say,
+                 raw: bytes = b"") -> None:
         if code == E_LIGHTS_OUT:
             say("green_green_green")
         elif code == E_RED_FLAG:
@@ -45,8 +49,11 @@ class EventRule:
             if self.cd.ready("drsd", 30):
                 say("drs_disabled")
         elif code == E_PENALTY:
-            if self.cd.ready("pena", 5):
-                say("penalty_5s")
+            # Payload: m_penaltyType, m_infringementType, m_vehicleIdx, ...
+            if self.penalties is not None and raw:
+                self.penalties.on_penalty(raw[0], say)
+            elif self.cd.ready("pena", 5):
+                say("penalty_pending")
         elif code == E_COLLISION:
             if self.cd.ready("coll", 6):
                 say("contact")
@@ -120,19 +127,69 @@ class SafetyCarRule:
             say("fcy_end" if full_course_yellow else "race_restart")
 
 
+# Типы штрафов из спецификации F1 (m_penaltyType в событии PENA).
+PEN_DRIVE_THROUGH = 0
+PEN_STOP_GO = 1
+PEN_TIME_PENALTY = 4
+PEN_WARNING = 6
+PEN_DISQUALIFIED = 7
+PEN_RETIRED = 9
+
+# Что говорить на каждый тип.
+PENALTY_PHRASE = {
+    PEN_DRIVE_THROUGH: "penalty_drive_through",
+    PEN_STOP_GO: "penalty_stop_go",
+    PEN_TIME_PENALTY: "penalty_5s",
+    PEN_WARNING: "warning_track_limits",
+}
+
+
 class PenaltyRule:
-    """Предупреждения за границы трассы."""
+    """Штрафы и предупреждения.
+
+    F1 присылает тип штрафа в событии, у LMU есть только счётчик - там
+    отличить стоп-энд-гоу от проезда нельзя, поэтому говорим общее.
+    """
 
     def __init__(self) -> None:
         self.warnings = -1
+        self.penalties = -1
+        self.unserved = -1
+        self.cd = Cooldown()
+
+    def on_penalty(self, penalty_type: int, say: Say) -> None:
+        """Событие PENA из F1: тип штрафа известен точно."""
+        phrase = PENALTY_PHRASE.get(penalty_type)
+        if phrase and self.cd.ready(f"pen_{penalty_type}", 5):
+            say(phrase)
 
     def update(self, state: GameState, say: Say) -> None:
         me = state.me
         if me is None:
             return
+
+        # Границы трассы.
         if self.warnings < 0:
             self.warnings = me.corner_cutting_warnings
-            return
-        if me.corner_cutting_warnings > self.warnings:
+        elif me.corner_cutting_warnings > self.warnings:
             say("warning_track_limits")
         self.warnings = me.corner_cutting_warnings
+
+        # Штрафы по счётчику: так их видно и в LMU, где событий нет.
+        if self.penalties < 0:
+            self.penalties = me.penalties
+        elif me.penalties > self.penalties and self.cd.ready("pen_new", 6):
+            say("penalty_pending")
+        self.penalties = me.penalties
+
+        # Неотбытые штрафы: напоминаем, пока висят.
+        unserved = me.num_unserved_drive_through + me.num_unserved_stop_go
+        if unserved > 0 and self.cd.ready("unserved", 45):
+            if me.num_unserved_stop_go > 0:
+                say("penalty_stop_go")
+            else:
+                say("penalty_drive_through")
+            say("serve_penalty_now")
+        elif self.unserved > 0 and unserved == 0:
+            say("penalty_served")
+        self.unserved = unserved

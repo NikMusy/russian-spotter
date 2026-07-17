@@ -314,6 +314,9 @@ class LMUAdapter:
             penalties=v.mNumPenalties,
             total_warnings=0,
             corner_cutting_warnings=0,
+            # LMU не раскладывает штрафы по типам - только общий счётчик.
+            num_unserved_drive_through=0,
+            num_unserved_stop_go=0,
             grid_position=v.mQualification if v.mQualification > 0 else 0,
             driver_status=driver,
             # 2 = активен; для нас важно лишь, что машина в игре.

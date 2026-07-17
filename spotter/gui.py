@@ -16,6 +16,7 @@ from .audio.phrases import (
 )
 from .audio.radio import RadioConfig
 from .engine import Engine
+from .history import append as history_append
 
 # Симы, у которых есть адаптер телеметрии. Для остальных фразы записывать
 # можно, но слушать пока нечего.
@@ -45,6 +46,8 @@ class App(tk.Tk):
         self.thread: threading.Thread | None = None
         self.messages: queue.Queue = queue.Queue()
         self.voicepacks_dir = root_dir / "voicepacks"
+        self.history_path = root_dir / "history.json"
+        self.stats_win = None
 
         self.title("Русский споттер")
         self.configure(bg=BG)
@@ -210,10 +213,12 @@ class App(tk.Tk):
         # --- низ
         bottom = ttk.Frame(self, padding=(16, 0, 16, 14))
         bottom.pack(fill="x")
+        ttk.Button(bottom, text="Статистика", style="Flat.TButton",
+                   command=self._open_stats).pack(side="left")
         ttk.Button(bottom, text="Записать фразы", style="Flat.TButton",
-                   command=self._open_recorder).pack(side="left")
+                   command=self._open_recorder).pack(side="left", padx=8)
         ttk.Button(bottom, text="Папка со звуками", style="Flat.TButton",
-                   command=self._open_sounds).pack(side="left", padx=8)
+                   command=self._open_sounds).pack(side="left")
         ttk.Button(bottom, text="Очистить лог", style="Flat.TButton",
                    command=self._clear_log).pack(side="right")
 
@@ -358,6 +363,30 @@ class App(tk.Tk):
         except OSError as exc:
             self._say(f"Не запускается рекордер: {exc}", "miss")
 
+    def _open_stats(self) -> None:
+        from .stats_gui import open_stats
+        if self.stats_win is not None and self.stats_win.winfo_exists():
+            self.stats_win.reload()
+            self.stats_win.lift()
+            return
+        self.stats_win = open_stats(self, self.history_path)
+
+    def _on_result(self, entry) -> None:
+        """Заезд закончился - в историю. Зовётся из потока движка."""
+        self.messages.put(("__result__", entry))
+
+    def _save_result(self, entry) -> None:
+        history_append(self.history_path, entry)
+        line = (f"{entry.flag} {entry.track_title}, {entry.session_title.lower()}: "
+                f"финиш P{entry.finish}")
+        if entry.is_race and entry.grid:
+            g = entry.gained
+            line += f" (старт P{entry.grid}, {g:+d})" if g else \
+                    f" (старт P{entry.grid})"
+        self._append(line, "sys")
+        if self.stats_win is not None and self.stats_win.winfo_exists():
+            self.stats_win.reload()
+
     def _open_sounds(self) -> None:
         self.sounds_dir.mkdir(parents=True, exist_ok=True)
         try:
@@ -403,6 +432,7 @@ class App(tk.Tk):
                     (text, "miss" if missing else "spot")),
                 on_status=lambda ok, info: self.messages.put(
                     ("__status__", (ok, info))),
+                on_result=self._on_result,
             )
         except Exception as exc:  # порт занят, нет звукового устройства
             self._say(f"Не стартует: {exc}", "miss")
@@ -460,6 +490,9 @@ class App(tk.Tk):
             if text == "__status__":
                 ok, info = tag
                 self._set_dot(GREEN if ok else AMBER, info)
+                continue
+            if text == "__result__":
+                self._save_result(tag)
                 continue
             self._append(text, tag)
         self.after(80, self._drain)

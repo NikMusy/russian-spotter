@@ -169,11 +169,26 @@
 [!] penalty_5s               пять секунд штрафа
     penalty_5s__hard         пять секунд штрафа, блядь   (мат)
     penalty_10s              десять секунд штрафа
-    penalty_drive_through    штраф проезд по пит-лейн
+    penalty_10s__hard        десять секунд штрафа, ну ты дал   (мат)
+[!] penalty_drive_through    штраф, проезд по пит-лейн
+    penalty_drive_through__hard штраф, проезд по пит-лейн, блядь   (мат)
+[!] penalty_stop_go          штраф, стоп энд гоу
+                             ^ самый злой штраф - стоять в боксе
+    penalty_stop_go__hard    штраф, стоп энд гоу, пиздец   (мат)
+    penalty_stop_go_10       стоп энд гоу, десять секунд
+    penalty_stop_go_10__hard стоп энд гоу десять секунд, ебать   (мат)
+[!] serve_penalty_now        отбывай штраф в этом круге
+    serve_penalty_now__hard  отбывай штраф сейчас, блядь, не тяни   (мат)
+[!] penalty_pending          на тебе висит штраф
+    penalty_pending__hard    на тебе висит штраф, блядь   (мат)
 [!] warning_track_limits     следи за границами трассы
     warning_track_limits__hard съедешь ещё раз - штраф, блядь   (мат)
-    penalty_served           штраф отбыт
+[!] penalty_served           штраф отбыт, поехали
+    penalty_served__hard     штраф отбыт, погнали нахуй   (мат)
 [!] give_position_back       верни позицию
+    give_position_back__hard верни позицию нахуй, а то штраф   (мат)
+    penalty_speeding         штраф за превышение в пит-лейн
+    penalty_speeding__hard   штраф за превышение, ну куда ты гнал   (мат)
 
 ПОЗИЦИЯ
 ----------------------------------------------------------------------
@@ -425,7 +440,7 @@ iRACING (инциденты)
 ОБЩЕЕ
 ----------------------------------------------------------------------
 [!] radio_check              связь есть, слышу тебя хорошо
-                             ^ играет при старте программы - проверка что всё работает
+                             ^ первое, что слышишь при подключении - проверка связи
 [!] green_green_green        зелёный, зелёный, зелёный
                              ^ старт гонки, энергично
 [!] good_race                отличная гонка, поздравляю
@@ -440,10 +455,10 @@ iRACING (инциденты)
 СКОЛЬКО ЗАПИСЫВАТЬ
 
   сим                                 файлов  только core
-  F1 25 / F1 24                          279          206
-  Le Mans Ultimate                       301          232
-  Assetto Corsa Competizione             287          220
-  Automobilista 2 / Project CARS 2       295          226
-  iRacing                                303          230
+  F1 25 / F1 24                          293          217
+  Le Mans Ultimate                       315          243
+  Assetto Corsa Competizione             301          231
+  Automobilista 2 / Project CARS 2       309          237
+  iRacing                                317          241
 
-  всё сразу, любой сим                   325          239
+  всё сразу, любой сим                   339          250

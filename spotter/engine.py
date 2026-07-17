@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .audio.player import Player
 from .audio.radio import RadioConfig
+from .history import Entry, SessionTracker
 from .rules.base import Say
 from .rules.car import DamageRule, FuelRule, PitLimiterRule, TyreRule
 from .rules.classes import ClassPositionRule, ClassTrafficRule
@@ -39,11 +40,15 @@ class Engine:
                  on_status=None, radio: RadioConfig | None = None,
                  sim: str = "f1", memes: bool = True,
                  meme_chance: float = 0.25,
-                 voicepack_dir: Path | None = None) -> None:
+                 voicepack_dir: Path | None = None,
+                 on_result=None) -> None:
         self.port = port
         self.sim = sim
         self.verbose = verbose
         self.on_status = on_status
+        # Куда отдать результат заезда, когда сессия закончилась.
+        self.on_result = on_result
+        self.history = SessionTracker()
         self.state = GameState(sim=sim)
         self.player = Player(sounds_dir, swearing=swearing, volume=volume,
                              verbose=verbose, on_message=on_message,
@@ -53,10 +58,11 @@ class Engine:
         self.player.prewarm()
 
         self.proximity = ProximityRule()
-        self.events = EventRule()
+        self.penalties = PenaltyRule()
+        self.events = EventRule(penalties=self.penalties)
         self.slow_rules = [
             TrackAnnounceRule(),
-            FlagRule(), SafetyCarRule(), PenaltyRule(),
+            FlagRule(), SafetyCarRule(), self.penalties,
             PitLimiterRule(), TyreRule(), FuelRule(), DamageRule(),
             WeatherRule(), PositionRule(), LapRule(), GapRule(),
             ClassTrafficRule(), ClassPositionRule(),
@@ -82,6 +88,25 @@ class Engine:
     def _status(self, connected: bool, info: str) -> None:
         if self.on_status is not None:
             self.on_status(connected, info)
+
+    def _track_history(self) -> None:
+        """Обновляет запись о заезде; отдаёт наружу, когда сессия сменилась."""
+        try:
+            done = self.history.update(self.state)
+        except Exception:
+            return          # статистика не стоит того, чтобы ронять споттер
+        if done is not None and self.on_result is not None:
+            self.on_result(done)
+
+    def flush_history(self) -> Entry | None:
+        """Закрывает текущий заезд - на выходе из программы."""
+        try:
+            done = self.history.finish()
+        except Exception:
+            return None
+        if done is not None and self.on_result is not None:
+            self.on_result(done)
+        return done
 
     def run(self) -> None:
         self._stop.clear()
@@ -193,7 +218,8 @@ class Engine:
         self.state.update(header, payload)
 
         if header.packet_id == PacketId.EVENT and isinstance(payload, Event):
-            self.events.on_event(payload.code, self.state, self.say)
+            self.events.on_event(payload.code, self.state, self.say,
+                                 payload.raw)
             return
 
         # Споттер - на каждом кадре движения, иначе он опоздает.
@@ -205,6 +231,7 @@ class Engine:
             self._last_slow = now
             for rule in self.slow_rules:
                 rule.update(self.state, self.say)
+            self._track_history()
 
     def _tick_idle(self) -> None:
         if self._was_connected and self.state.is_stale(5.0):
@@ -225,6 +252,8 @@ class Engine:
 
     def shutdown(self) -> None:
         self._stop.set()
+        # Заезд мог не закончиться штатно - сохраняем, что есть.
+        self.flush_history()
         self.player.shutdown()
         if self._sock is not None:
             try:

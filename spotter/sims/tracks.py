@@ -80,6 +80,53 @@ NAME_MATCH: list[tuple[tuple[str, ...], str]] = [
 
 UNKNOWN = "track_unknown"
 
+# id фразы -> (как показать, флаг страны). Флаг - эмодзи: Windows рисует
+# их шрифтом Segoe UI Emoji, отдельные картинки таскать не нужно.
+TRACK_INFO: dict[str, tuple[str, str]] = {
+    "track_lemans": ("Ле-Ман", "🇫🇷"),
+    "track_sebring": ("Себринг", "🇺🇸"),
+    "track_fuji": ("Фудзи", "🇯🇵"),
+    "track_portimao": ("Портимао", "🇵🇹"),
+    "track_paul_ricard": ("Поль Рикар", "🇫🇷"),
+    "track_mugello": ("Муджелло", "🇮🇹"),
+    "track_aragon": ("Арагон", "🇪🇸"),
+    "track_nurburgring": ("Нюрбургринг", "🇩🇪"),
+    "track_spa": ("Спа", "🇧🇪"),
+    "track_monza": ("Монца", "🇮🇹"),
+    "track_imola": ("Имола", "🇮🇹"),
+    "track_bahrain": ("Бахрейн", "🇧🇭"),
+    "track_interlagos": ("Интерлагос", "🇧🇷"),
+    "track_cota": ("Остин", "🇺🇸"),
+    "track_qatar": ("Катар", "🇶🇦"),
+    "track_silverstone": ("Сильверстоун", "🇬🇧"),
+    "track_suzuka": ("Судзука", "🇯🇵"),
+    "track_barcelona": ("Барселона", "🇪🇸"),
+    "track_zandvoort": ("Зандворт", "🇳🇱"),
+    "track_hungaroring": ("Хунгароринг", "🇭🇺"),
+    "track_red_bull_ring": ("Ред Булл Ринг", "🇦🇹"),
+    "track_monaco": ("Монако", "🇲🇨"),
+    "track_melbourne": ("Мельбурн", "🇦🇺"),
+    "track_shanghai": ("Шанхай", "🇨🇳"),
+    "track_montreal": ("Монреаль", "🇨🇦"),
+    "track_baku": ("Баку", "🇦🇿"),
+    "track_singapore": ("Сингапур", "🇸🇬"),
+    "track_mexico": ("Мехико", "🇲🇽"),
+    "track_abu_dhabi": ("Абу-Даби", "🇦🇪"),
+    "track_jeddah": ("Джидда", "🇸🇦"),
+    "track_miami": ("Майами", "🇺🇸"),
+    "track_vegas": ("Лас-Вегас", "🇺🇸"),
+    "track_unknown": ("неизвестная трасса", "🏁"),
+}
+
+
+def title(phrase_id: str) -> str:
+    """Человеческое имя трассы для окна статистики."""
+    return TRACK_INFO.get(phrase_id, TRACK_INFO[UNKNOWN])[0]
+
+
+def flag(phrase_id: str) -> str:
+    return TRACK_INFO.get(phrase_id, TRACK_INFO[UNKNOWN])[1]
+
 
 def by_f1_id(track_id: int) -> str:
     return F1_TRACKS.get(track_id, UNKNOWN)

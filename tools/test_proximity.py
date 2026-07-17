@@ -25,6 +25,7 @@ def lap(pit: int = 0, status: int = 4, result: int = 2) -> LapData:
         lap_distance=0.0, total_distance=0.0, safety_car_delta=0.0,
         position=1, current_lap=1, pit_status=pit, num_pit_stops=0, sector=0,
         lap_invalid=0, penalties=0, total_warnings=0, corner_cutting_warnings=0,
+        num_unserved_drive_through=0, num_unserved_stop_go=0,
         grid_position=1, driver_status=status, result_status=result,
         pit_lane_timer_active=0,
     )

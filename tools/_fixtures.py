@@ -21,13 +21,17 @@ def motion_at(x: float, z: float) -> CarMotion:
 
 
 def lap(pit: int = 0, status: int = 4, result: int = 2,
-        position: int = 1, current_lap: int = 5) -> LapData:
+        position: int = 1, current_lap: int = 5, penalties: int = 0,
+        warnings: int = 0, unserved_dt: int = 0,
+        unserved_sg: int = 0) -> LapData:
     return LapData(
         last_lap_ms=0, current_lap_ms=0, delta_front_ms=0, delta_leader_ms=0,
         lap_distance=0.0, total_distance=0.0, safety_car_delta=0.0,
         position=position, current_lap=current_lap, pit_status=pit,
-        num_pit_stops=0, sector=0, lap_invalid=0, penalties=0,
-        total_warnings=0, corner_cutting_warnings=0, grid_position=1,
+        num_pit_stops=0, sector=0, lap_invalid=0, penalties=penalties,
+        total_warnings=warnings, corner_cutting_warnings=warnings,
+        num_unserved_drive_through=unserved_dt,
+        num_unserved_stop_go=unserved_sg, grid_position=1,
         driver_status=status, result_status=result, pit_lane_timer_active=0,
     )
 
