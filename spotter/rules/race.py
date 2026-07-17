@@ -11,8 +11,16 @@ from .base import Cooldown, Say
 GAP_EVERY = 45.0
 # Отрыв больше этого не интересен - соперник вне досягаемости.
 GAP_MAX = 25.0
-# Зона DRS.
+# Зона DRS в F1: игра открывает крыло при отрыве меньше секунды.
 DRS_GAP = 1.0
+# Слипстрим в эндурансе. Ощутимо тащит примерно с двух корпусов (~10 м),
+# сильно - когда ближе. На гоночной скорости это отрыв меньше ~0.7 сек;
+# ближе 0.4 сек - уже плотный мешок, можно готовить обгон.
+SLIPSTREAM_GAP = 0.7
+SLIPSTREAM_CLOSE = 0.4
+
+# У кого DRS, а у кого только слипстрим.
+DRS_SIMS = ("f1", "ams2")
 
 
 class PositionRule:
@@ -110,13 +118,23 @@ class GapRule:
 
         gap = me.delta_front_ms / 1000.0
 
-        # DRS-зона - новость посвежее, чем сам отрыв.
-        if 0 < gap <= DRS_GAP:
-            if not self.told_drs and self.cd.ready("drs", 20):
-                self.told_drs = True
-                say("in_drs_range")
-            return
-        self.told_drs = False
+        # Близость к машине впереди - новость посвежее, чем сам отрыв.
+        # В F1 это зона DRS, в эндурансе - слипстрим.
+        if state.sim in DRS_SIMS:
+            if 0 < gap <= DRS_GAP:
+                if not self.told_drs and self.cd.ready("drs", 20):
+                    self.told_drs = True
+                    say("in_drs_range")
+                return
+            self.told_drs = False
+        else:
+            if 0 < gap <= SLIPSTREAM_GAP:
+                if not self.told_drs and self.cd.ready("slip", 15):
+                    self.told_drs = True
+                    say("in_slipstream_close" if gap <= SLIPSTREAM_CLOSE
+                        else "in_slipstream")
+                return
+            self.told_drs = False
 
         if me.position == 1 or gap <= 0 or gap > GAP_MAX:
             return

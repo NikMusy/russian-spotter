@@ -142,6 +142,52 @@ for stype, sim, want_silent, label in [
     print(f"  {'OK  ' if ok else 'FAIL'} {label:<42} -> {got}")
 
 print()
+print("СЛИПСТРИМ vs DRS")
+print("-" * 58)
+from spotter.rules.race import GapRule
+
+
+def gap_state(sim, gap_sec):
+    st = GameState(sim=sim)
+    st.session = make_session(SessionType.RACE)
+    st.player_index = 0
+    me = lap(position=3, current_lap=5)
+    me.delta_front_ms = int(gap_sec * 1000)
+    st.laps = [me]
+    st.motion = [motion_at(0, 0)]
+    st.telemetry = telemetry(250)
+    return st
+
+
+SLIP = {"in_slipstream", "in_slipstream_close", "in_drs_range"}
+CASES = [
+    ("f1", 0.8, "in_drs_range", "F1, отрыв 0.8 -> зона DRS"),
+    ("lmu", 0.6, "in_slipstream", "LMU, отрыв 0.6 -> слипстрим"),
+    ("lmu", 0.3, "in_slipstream_close", "LMU, отрыв 0.3 -> плотно в мешке"),
+    ("lmu", 1.2, "gap_ahead", "LMU, отрыв 1.2 -> далеко, называет отрыв"),
+    ("f1", 0.6, "in_drs_range", "F1 не говорит про слипстрим"),
+]
+for sim, g, want, label in CASES:
+    said = []
+    GapRule().update(gap_state(sim, g), lambda *ids, **kw: said.extend(ids))
+    got = said[0] if said else None
+    ok = got == want
+    # на далёком отрыве не должно быть слипстрим-фраз вообще
+    if g > 1.0:
+        ok = ok and not (SLIP & set(said))
+    fails += not ok
+    print(f"  {'OK  ' if ok else 'FAIL'} {label:<42} -> {got}")
+
+# слипстрим-фразы не предлагаются F1, DRS - не предлагается LMU
+from spotter.audio.phrases import BY_ID, SIM_F1, SIM_LMU
+ok = not BY_ID["in_slipstream"].for_sim(SIM_F1)
+fails += not ok
+print(f"  {'OK  ' if ok else 'FAIL'} слипстрим не в плане F1")
+ok = not BY_ID["in_drs_range"].for_sim(SIM_LMU)
+fails += not ok
+print(f"  {'OK  ' if ok else 'FAIL'} DRS не в плане LMU")
+
+print()
 print("-" * 58)
 print("ВСЁ ПРОШЛО" if fails == 0 else f"ПРОВАЛОВ: {fails}")
 sys.exit(1 if fails else 0)

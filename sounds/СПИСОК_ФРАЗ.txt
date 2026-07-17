@@ -288,7 +288,12 @@
                              ^ разделитель целой и десятой: два И пять
 [!] closing                  ты догоняешь
 [!] pulling_away             он отрывается
-[!] in_drs_range             ты в зоне DRS
+[!] in_drs_range             ты в зоне DRS   (сим: f1, ams2)
+[!] in_slipstream            ты в слипстриме, держись за ним   (сим: lmu, acc, iracing, ams2)
+                             ^ в эндурансе DRS нет, тянет слипстрим
+[!] in_slipstream_close      плотно в мешке, готовь обгон   (сим: lmu, acc, iracing, ams2)
+                             ^ совсем близко, слипстрим тащит сильнее всего
+    in_slipstream_close__hard сел ему на хвост, дави   (мат)
     he_is_faster             он быстрее тебя
     push_now                 жми, сейчас твой шанс
     push_now__hard           жми, блядь, давай   (мат)
@@ -517,9 +522,9 @@ iRACING (инциденты)
 
   сим                                 файлов  только core
   F1 25 / F1 24                          338          250
-  Le Mans Ultimate                       361          276
-  Assetto Corsa Competizione             347          264
-  Automobilista 2 / Project CARS 2       355          270
-  iRacing                                363          274
+  Le Mans Ultimate                       363          278
+  Assetto Corsa Competizione             349          266
+  Automobilista 2 / Project CARS 2       358          273
+  iRacing                                365          276
 
-  всё сразу, любой сим                   385          283
+  всё сразу, любой сим                   388          286
