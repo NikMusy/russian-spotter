@@ -18,6 +18,7 @@ from .rules.events import (
 )
 from .rules.proximity import ProximityRule
 from .rules.race import GapRule, LapRule, PositionRule
+from .rules.result import announce as announce_result
 from .rules.track import TrackAnnounceRule
 from .rules.weather import WeatherRule
 from .state import GameState
@@ -95,8 +96,7 @@ class Engine:
             done = self.history.update(self.state)
         except Exception:
             return          # статистика не стоит того, чтобы ронять споттер
-        if done is not None and self.on_result is not None:
-            self.on_result(done)
+        self._finish(done, speak=True)
 
     def flush_history(self) -> Entry | None:
         """Закрывает текущий заезд - на выходе из программы."""
@@ -104,9 +104,17 @@ class Engine:
             done = self.history.finish()
         except Exception:
             return None
-        if done is not None and self.on_result is not None:
-            self.on_result(done)
+        # На выходе не озвучиваем: программу уже закрывают.
+        self._finish(done, speak=False)
         return done
+
+    def _finish(self, done: Entry | None, speak: bool) -> None:
+        if done is None:
+            return
+        if speak:
+            announce_result(done, self.say)
+        if self.on_result is not None:
+            self.on_result(done)
 
     def run(self) -> None:
         self._stop.clear()

@@ -126,6 +126,8 @@ class ProximityRule:
         me_lap = state.me
         if me_motion is None or me_lap is None:
             return CLEAR
+        if state.cars_are_ghosts:
+            return CLEAR
         if state.speed_kmh < MIN_SPEED_KMH:
             return CLEAR
         if me_lap.pit_status != PitStatus.NONE:

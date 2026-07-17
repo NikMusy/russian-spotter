@@ -258,9 +258,39 @@ class LMUAdapter:
         if telemetry.playerHasVehicle and idx < S.MAX_VEHICLES:
             tele = telemetry.telemInfo[idx]
             state.update(header, self._telemetry(tele))
-            state.update(header, self._status(tele, vehicles[player]))
+            state.update(header, self._status(tele, vehicles[player], scoring))
             state.update(header, self._damage(tele))
+            state.wheels_detached = tuple(bool(w.mDetached)
+                                          for w in tele.mWheel)
+            state.rival_lost_wheel_ahead = self._rival_wheel_off(
+                snap, me.mLapDist, scoring.mLapDist)
         return True
+
+    def _rival_wheel_off(self, snap, my_dist: float,
+                         track_len: float) -> bool:
+        """Есть ли впереди в пределах ста метров машина с отвалившимся колесом.
+
+        Телеметрия и таблица позиций - разные массивы, связаны через mID,
+        поэтому сперва строим карту слот -> дистанция.
+        """
+        tel = snap.data.telemetry
+        veh = snap.data.scoring.vehScoringInfo
+        n = snap.data.scoring.scoringInfo.mNumVehicles
+        dist_by_id = {veh[i].mID: veh[i].mLapDist for i in range(min(n, S.MAX_VEHICLES))}
+
+        for i in range(min(tel.activeVehicles, S.MAX_VEHICLES)):
+            car = tel.telemInfo[i]
+            if not any(w.mDetached for w in car.mWheel):
+                continue
+            d = dist_by_id.get(car.mID)
+            if d is None:
+                continue
+            gap = d - my_dist
+            if track_len > 0 and gap < -track_len / 2:
+                gap += track_len
+            if 0 < gap < 100:
+                return True
+        return False
 
 
     def _motion(self, v: S.VehicleScoringInfoV01) -> CarMotion:
@@ -347,6 +377,29 @@ class LMUAdapter:
             forecast=[],             # LMU прогноз наружу не отдаёт
         )
 
+    def _flag(self, v: S.VehicleScoringInfoV01,
+              scoring: S.ScoringInfoV01) -> int:
+        """Какой флаг показывают лично нам.
+
+        mUnderYellow - это только полная жёлтая, взятая на старт-финише.
+        Локальные жёлтые лежат отдельно, в mSectorFlag, и без них споттер
+        молчал про жёлтый в секторе.
+        """
+        if scoring.mGamePhase == S.GamePhase.STOPPED:
+            return Flag.RED
+        if v.mFlag == S.VehFlag.BLUE:
+            return Flag.BLUE
+
+        # mSector: 0=третий, 1=первый, 2=второй. В заголовке честно
+        # написано, что порядок в mSectorFlag они сами не помнят, поэтому
+        # берём тот же индекс - он совпадает в обе стороны.
+        sector = v.mSector
+        if 0 <= sector < 3 and scoring.mSectorFlag[sector]:
+            return Flag.YELLOW
+        if v.mUnderYellow or scoring.mYellowFlagState > S.YellowState.NONE:
+            return Flag.YELLOW
+        return Flag.GREEN
+
     def _telemetry(self, t: S.TelemInfoV01) -> Telemetry:
         # Температуры в Кельвинах, наружу отдаём Цельсий.
         surface = []
@@ -375,14 +428,9 @@ class LMUAdapter:
             surface_type=tuple(w.mSurfaceType for w in t.mWheel),
         )
 
-    def _status(self, t: S.TelemInfoV01,
-                v: S.VehicleScoringInfoV01) -> CarStatus:
-        if v.mFlag == S.VehFlag.BLUE:
-            flag = Flag.BLUE
-        elif v.mUnderYellow:
-            flag = Flag.YELLOW
-        else:
-            flag = Flag.GREEN
+    def _status(self, t: S.TelemInfoV01, v: S.VehicleScoringInfoV01,
+                scoring: S.ScoringInfoV01) -> CarStatus:
+        flag = self._flag(v, scoring)
 
         # Сколько кругов проедем на остатке топлива - считаем сами.
         laps_left = 0.0

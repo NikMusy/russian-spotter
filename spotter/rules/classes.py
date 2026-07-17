@@ -1,8 +1,12 @@
 """Трафик классов в эндурансе.
 
-Симы отдают класс строкой ("Hypercar", "LMP2", "GTE"...), поэтому
-опознаём по куску названия. Если классов в сессии нет или он один -
-правило молчит.
+Симы отдают класс строкой ("Hyper", "GT3", "LMP2"), поэтому опознаём по
+куску названия. Если классов в сессии нет или он один - правило молчит.
+
+Расстояние до соперника считаем ВДОЛЬ ТРАССЫ, а не по прямой. Раньше тут
+стояла проверка "не дальше 12 метров вбок", и на дуге поворота она резала
+всё подряд: машина в сорока метрах позади по трассе на затяжном повороте
+уходит вбок гораздо дальше, и правило молчало почти всю гонку.
 """
 
 from __future__ import annotations
@@ -23,12 +27,14 @@ CLASS_MATCH: list[tuple[tuple[str, ...], str, int]] = [
     (("lmgt3", "gt3"), "gt3", 1),
 ]
 
-# Насколько близко сзади, чтобы предупредить, метры.
-BEHIND_NEAR = 45.0
-# Впереди - дальше, обгон готовится заранее.
-AHEAD_NEAR = 60.0
-# Не тараторить.
+# Метры по трассе. Сзади - когда уже дышит в спину, впереди - заранее,
+# чтобы успеть спланировать обгон.
+BEHIND_NEAR = 70.0
+AHEAD_NEAR = 90.0
+# Вплотную не считаем: там уже работает обычный споттер со своим "слева".
+TOO_CLOSE = 4.0
 EVERY = 12.0
+MIN_SPEED = 40
 
 
 def classify(name: str) -> tuple[str, int]:
@@ -40,6 +46,22 @@ def classify(name: str) -> tuple[str, int]:
     return "", 0
 
 
+def _gap_along_track(rival_dist: float, my_dist: float,
+                     track_len: float) -> float:
+    """Метры по трассе: плюс - соперник впереди, минус - сзади.
+
+    Круг замкнут, поэтому машина в десяти метрах впереди может числиться
+    почти на круг позади - разворачиваем через половину длины трассы.
+    """
+    gap = rival_dist - my_dist
+    if track_len > 0:
+        if gap > track_len / 2:
+            gap -= track_len
+        elif gap < -track_len / 2:
+            gap += track_len
+    return gap
+
+
 class ClassTrafficRule:
     def __init__(self) -> None:
         self.cd = Cooldown()
@@ -47,26 +69,25 @@ class ClassTrafficRule:
     def update(self, state: GameState, say: Say) -> None:
         if not state.car_classes or not state.on_track or state.in_pits:
             return
-        me_motion = state.my_motion
-        me_lap = state.me
-        if me_motion is None or me_lap is None:
+        # В квалификации LMU соперники - призраки, трафика нет.
+        if state.cars_are_ghosts:
             return
-        if state.speed_kmh < 40:
+        me = state.me
+        if me is None or state.speed_kmh < MIN_SPEED:
             return
 
         my_name, my_speed = classify(state.my_class)
         if not my_name:
             return
 
+        track_len = state.session.track_length if state.session else 0
+
         faster_behind = None
         slower_ahead = None
 
-        for i, motion in enumerate(state.motion):
-            if i == state.player_index or i >= len(state.laps):
+        for i, rival in enumerate(state.laps):
+            if i == state.player_index or i >= len(state.car_classes):
                 continue
-            if i >= len(state.car_classes):
-                continue
-            rival = state.laps[i]
             if rival.driver_status == DriverStatus.IN_GARAGE:
                 continue
             if rival.pit_status != PitStatus.NONE:
@@ -76,23 +97,16 @@ class ClassTrafficRule:
             if not name or speed == my_speed:
                 continue
 
-            dx = motion.x - me_motion.x
-            dz = motion.z - me_motion.z
-            if dx * dx + dz * dz > 6400:      # дальше 80 м не интересует
-                continue
+            gap = _gap_along_track(rival.lap_distance, me.lap_distance,
+                                   track_len)
 
-            lon = dx * me_motion.fwd_x + dz * me_motion.fwd_z
-            lat = dx * me_motion.right_x + dz * me_motion.right_z
-            if abs(lat) > 12:                 # соседний ряд, не наш трафик
-                continue
-
-            if speed > my_speed and -BEHIND_NEAR < lon < -3:
-                # Быстрее и догоняет - самое важное.
-                if faster_behind is None or lon > faster_behind[0]:
-                    faster_behind = (lon, name)
-            elif speed < my_speed and 3 < lon < AHEAD_NEAR:
-                if slower_ahead is None or lon < slower_ahead[0]:
-                    slower_ahead = (lon, name)
+            if speed > my_speed and -BEHIND_NEAR < gap < -TOO_CLOSE:
+                # Ближайший из догоняющих - он и важен.
+                if faster_behind is None or gap > faster_behind[0]:
+                    faster_behind = (gap, name)
+            elif speed < my_speed and TOO_CLOSE < gap < AHEAD_NEAR:
+                if slower_ahead is None or gap < slower_ahead[0]:
+                    slower_ahead = (gap, name)
 
         if faster_behind is not None:
             _, name = faster_behind

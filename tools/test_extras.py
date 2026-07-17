@@ -136,11 +136,20 @@ for name, want in (("Hypercar", "hypercar"),
 
 
 def class_state(my_class, rivals):
-    """rivals: (класс, вдоль) - минус значит сзади."""
-    st = GameState()
+    """rivals: (класс, вдоль по трассе, метры) - минус значит сзади."""
+    st = GameState(sim="lmu")
     st.player_index = 0
-    st.motion = [motion_at(0.0, 0.0)] + [motion_at(0.0, z) for _, z in rivals]
-    st.laps = [lap()] + [lap() for _ in rivals]
+    st.session = make_session(SessionType.RACE)
+    st.session.track_length = 5000
+    me = lap()
+    me.lap_distance = 2000.0
+    laps = [me]
+    for _, gap in rivals:
+        r = lap()
+        r.lap_distance = 2000.0 + gap
+        laps.append(r)
+    st.laps = laps
+    st.motion = [motion_at(0.0, 0.0) for _ in range(len(rivals) + 1)]
     st.telemetry = telemetry(200)
     st.car_classes = [my_class] + [c for c, _ in rivals]
     return st

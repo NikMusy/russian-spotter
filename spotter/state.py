@@ -34,6 +34,9 @@ class GameState:
     # Заполняет адаптер сима, а не UDP-пакеты.
     track_name: str = ""                       # как его называет сим
     car_classes: list[str] = field(default_factory=list)  # класс каждой машины
+    # Отвалившиеся колёса. У F1 такого поля нет, там всегда False.
+    wheels_detached: tuple[bool, ...] = (False, False, False, False)
+    rival_lost_wheel_ahead: bool = False
 
     @property
     def my_class(self) -> str:
@@ -82,6 +85,21 @@ class GameState:
     def in_race(self) -> bool:
         return bool(self.session and self.session.session_type in (
             SessionType.RACE, SessionType.RACE_2, SessionType.RACE_3))
+
+    @property
+    def in_qualifying(self) -> bool:
+        return bool(self.session and self.session.session_type in (
+            SessionType.Q1, SessionType.Q2, SessionType.Q3,
+            SessionType.SHORT_Q, SessionType.OSQ))
+
+    @property
+    def cars_are_ghosts(self) -> bool:
+        """Соперники не столкновимы - предупреждать о них незачем.
+
+        В квалификации LMU машины проходят друг сквозь друга, и споттер,
+        честно кричащий "слева", просто мешает ехать круг.
+        """
+        return self.sim == "lmu" and self.in_qualifying
 
     @property
     def on_track(self) -> bool:

@@ -68,10 +68,14 @@ class FakeLMU:
 
     def scene(self, rivals, speed=60.0, raining=0.0, phase=S.GamePhase.GREEN,
               in_pits=False, limiter=False, place=3, lap=4, flag=0,
-              wear=0.95, flat=False, fuel=50.0, tyre_c=90.0):
+              wear=0.95, flat=False, fuel=50.0, tyre_c=90.0,
+              sector_yellow=False, wheel_off=False):
         """rivals: (поперёк, вдоль) в метрах. Игрок смотрит вдоль -Z."""
         d = self.layout.data
         sc = d.scoring.scoringInfo
+        sc.mSectorFlag[0] = sc.mSectorFlag[1] = sc.mSectorFlag[2] = 0
+        if sector_yellow:
+            sc.mSectorFlag[1] = 1      # игрок в mSector=1
         sc.mNumVehicles = 1 + len(rivals)
         sc.mTrackName = b"Circuit de la Sarthe"
         sc.mPlayerName = b"Test Driver"
@@ -144,6 +148,7 @@ class FakeLMU:
             w.mPressure = 165.0
             w.mWear = wear
             w.mFlat = flat and j == 0
+            w.mDetached = wheel_off and j == 0
         d.generic.gameVersion = 1140
         d.generic.events[S.SME_UPDATE_SCORING] = 1
         d.generic.events[S.SME_UPDATE_TELEMETRY] = 1
@@ -209,8 +214,14 @@ def main() -> None:
     step("шины на исходе")
     hold(fake, 3.0, [], wear=0.2)
 
+    step("жёлтый в твоём секторе")
+    hold(fake, 3.0, [], sector_yellow=True)
+
     step("прокол")
     hold(fake, 3.0, [], flat=True)
+
+    step("ОТВАЛИЛОСЬ КОЛЕСО")
+    hold(fake, 3.0, [], wheel_off=True)
 
     step("в пит-лейне на 90 км/ч без лимитера")
     hold(fake, 3.5, [], in_pits=True, speed=25.0, limiter=False)

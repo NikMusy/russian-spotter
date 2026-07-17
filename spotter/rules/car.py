@@ -147,8 +147,21 @@ class FuelRule:
 class DamageRule:
     def __init__(self) -> None:
         self.reported: set[str] = set()
+        self.lost_wheel = False
+        self.rival_wheel = False
 
     def update(self, state: GameState, say: Say) -> None:
+        # Колесо отвалилось - это конец заезда, важнее любых крыльев.
+        detached = any(state.wheels_detached)
+        if detached and not self.lost_wheel:
+            say("wheel_lost")
+        self.lost_wheel = detached
+
+        # У машины впереди отвалилось колесо - объезжай обломки.
+        if state.rival_lost_wheel_ahead and not self.rival_wheel:
+            say("rival_wheel_off")
+        self.rival_wheel = state.rival_lost_wheel_ahead
+
         d = state.damage
         if d is None or not state.on_track:
             return

@@ -7,7 +7,7 @@ F1 25 присылает прогноз сэмплами на 5/10/15/30/60 ми
 
 from __future__ import annotations
 
-from ..audio.numbers import integer as _number
+from ..audio import numbers
 from ..state import GameState
 from ..udp.packets import Weather
 from .base import Cooldown, Say
@@ -79,7 +79,7 @@ class WeatherRule:
         t = s.track_temperature
         if t <= 0:
             return
-        say("track_temp", *_number(t), "degrees")
+        say("track_temp", *numbers.with_word(t, "degrees"))
         if t < 22:
             say("track_cold")
         elif t > 45:
@@ -106,6 +106,8 @@ class WeatherRule:
             return
 
         self.announced_rain_for = soon.time_offset
-        say("rain_expected_in", *_number(soon.time_offset), "minutes")
+        say("rain_expected_in",
+            *numbers.with_word(soon.time_offset, "minutes"))
         if soon.rain_percentage:
-            say("rain_chance", *_number(soon.rain_percentage), "percent")
+            say("rain_chance",
+                *numbers.with_word(soon.rain_percentage, "percent"))

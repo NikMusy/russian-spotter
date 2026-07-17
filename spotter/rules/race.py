@@ -90,7 +90,7 @@ class LapRule:
             self.told_last_lap = True
             say("last_lap")
         elif 2 <= left <= 5:
-            say("laps_remaining", *numbers.integer(left))
+            say("laps_remaining", *numbers.with_word(left, "laps"))
         elif not self.told_half and lap == total // 2 and total >= 10:
             self.told_half = True
             say("half_distance")
@@ -123,4 +123,5 @@ class GapRule:
         if not self.cd.ready("gap", GAP_EVERY):
             return
 
-        say("gap_ahead", *numbers.decimal(gap), "seconds")
+        # with_word сам подберёт падеж: одна секунда, две и пять секунды.
+        say("gap_ahead", *numbers.with_word(gap, "seconds", decimals=True))
