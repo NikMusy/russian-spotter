@@ -1,0 +1,28 @@
+# sounds/ - личная папка: сюда пишет recorder.exe, у каждого своя.
+# Готовые банки лежат в voicepacks/ и в репозиторий как раз входят.
+sounds/*.wav
+!sounds/СПИСОК_ФРАЗ.txt
+
+# Сборка
+build/
+dist/
+*.spec
+*.exe
+
+# Локальные настройки и логи
+config.json
+spotter.log
+exe_out.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Редакторы
+.vscode/
+.idea/
+*.swp
