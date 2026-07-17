@@ -112,6 +112,50 @@ ok = n > 250
 fails += not ok
 print(f"  {'OK  ' if ok else 'FAIL'} voicepacks/nikolay: {n} фраз")
 
+# --- первый запуск: споттер обязан заговорить сам
+print()
+print("ПЕРВЫЙ ЗАПУСК (как у нового человека)")
+print("-" * 62)
+
+import tkinter as tk
+from spotter.gui import App
+
+FRESH = Path(tempfile.mkdtemp(prefix="fresh_"))
+(FRESH / "sounds").mkdir()
+(FRESH / "voicepacks" / "nikolay").mkdir(parents=True)
+for pid in ("car_left", "car_right", "clear"):
+    save_wav(FRESH / "voicepacks" / "nikolay" / f"{pid}.wav", pack_tone)
+
+app = App(FRESH, {})          # пустой конфиг = первый запуск
+app.withdraw()
+picked = app._pack_dir()
+ok = picked is not None and picked.name == "nikolay"
+fails += not ok
+print(f"  {'OK  ' if ok else 'FAIL'} своих записей нет -> сам выбрал пак "
+      f"'{picked.name if picked else 'НИЧЕГО'}'")
+print(f"       в окне: '{app.pack_var.get()}'")
+app.destroy()
+
+# Если свои записи есть - не навязываем чужой голос
+save_wav(FRESH / "sounds" / "car_left.wav", own_tone)
+app2 = App(FRESH, {})
+app2.withdraw()
+picked = app2._pack_dir()
+ok = picked is None
+fails += not ok
+print(f"  {'OK  ' if ok else 'FAIL'} свои записи есть -> оставил свой голос")
+app2.destroy()
+
+# Явный выбор в конфиге уважается
+app3 = App(FRESH, {"voicepack": "nikolay"})
+app3.withdraw()
+picked = app3._pack_dir()
+ok = picked is not None and picked.name == "nikolay"
+fails += not ok
+print(f"  {'OK  ' if ok else 'FAIL'} выбор из конфига уважается")
+app3.destroy()
+shutil.rmtree(FRESH, ignore_errors=True)
+
 p.shutdown()
 p2.shutdown()
 shutil.rmtree(TMP, ignore_errors=True)

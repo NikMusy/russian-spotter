@@ -136,10 +136,7 @@ class App(tk.Tk):
                                      values=[p[0] for p in self.packs])
         self.pack_box.grid(row=1, column=1, sticky="w", pady=(10, 0))
         self.pack_box.bind("<<ComboboxSelected>>", self._on_pack)
-        saved = self.cfg.get("voicepack", "")
-        pos = next((i for i, (_, d) in enumerate(self.packs)
-                    if (d.name if d else "") == saved), 0)
-        self.pack_box.current(pos)
+        self.pack_box.current(self._initial_pack())
 
         # --- кнопки и статус
         row = ttk.Frame(self, padding=(16, 12, 16, 4))
@@ -242,6 +239,20 @@ class App(tk.Tk):
                     n = len(list(d.glob("*.wav")))
                     packs.append((f"{d.name}  ({n} фраз)", d))
         return packs
+
+    def _initial_pack(self) -> int:
+        """Какой голос выбрать при запуске.
+
+        На первом запуске своих записей ещё нет, и вариант "только свой
+        голос" означал бы полную тишину. Поэтому по умолчанию берём
+        готовый пак - споттер заговорит сразу.
+        """
+        saved = self.cfg.get("voicepack")
+        if saved is None:
+            own = any(self.sounds_dir.glob("*.wav"))
+            return 0 if own or len(self.packs) < 2 else 1
+        return next((i for i, (_, d) in enumerate(self.packs)
+                     if (d.name if d else "") == saved), 0)
 
     def _pack_dir(self) -> Path | None:
         pos = self.pack_box.current()
