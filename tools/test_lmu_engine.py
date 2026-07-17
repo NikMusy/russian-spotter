@@ -26,7 +26,7 @@ TMP = Path(tempfile.mkdtemp(prefix="lmu_bank_"))
 tone = (np.sin(2 * np.pi * 440 * np.linspace(0, 0.1, int(SAMPLE_RATE * 0.1),
                                              dtype=np.float32)) * 0.2)
 for pid in ("car_left", "car_left_2", "car_right", "car_right_2", "clear",
-            "clear_2", "three_wide", "still_there", "radio_check", "fcy",
+            "three_wide", "still_there", "radio_check", "fcy",
             "fcy_end", "flag_blue", "weather_rain_starting", "consider_inters",
             "weather_rain_stopping", "weather_drying", "consider_slicks",
             "tyres_overheating", "tyres_worn", "puncture", "limiter_reminder",
@@ -75,8 +75,7 @@ checks = [
     ("сказал 'слева'", "слева" in joined),
     ("сказал 'справа'", "справа" in joined),
     ("сказал 'с двух сторон'", "с двух сторон" in joined),
-    ("сказал 'чисто' или 'свободен'",
-     "чисто" in joined or "свободен" in joined),
+    ("сказал 'чисто'", "чисто" in joined),
     ("полная жёлтая, а не сейфти-кар",
      "полная жёлтая" in joined and "машина безопасности" not in joined),
     ("синий флаг", "синий" in joined),

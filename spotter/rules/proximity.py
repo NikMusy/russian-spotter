@@ -85,7 +85,7 @@ class ProximityRule:
                     self._pending_clear_at = now
                 elif now - self._pending_clear_at >= CLEAR_DELAY:
                     if self._announced:
-                        say(random.choice(("clear", "clear_2")))
+                        say("clear")
                     self._reset()
             return
 

@@ -26,7 +26,7 @@ TMP = Path(tempfile.mkdtemp(prefix="spotter_bank_"))
 tone = (np.sin(2 * np.pi * 440 * np.linspace(0, 0.12, int(SAMPLE_RATE * 0.12),
                                              dtype=np.float32)) * 0.2)
 for pid in ("car_left", "car_left_2", "car_right", "car_right_2", "clear",
-            "clear_2", "three_wide", "still_there", "radio_check",
+            "three_wide", "still_there", "radio_check",
             "limiter_reminder", "puncture", "flag_yellow_sector"):
     save_wav(TMP / f"{pid}.wav", tone.astype(np.float32))
 print(f"временный банк: {TMP}\n")
@@ -77,8 +77,7 @@ checks = [
     ("что-то реально прозвучало", len(spoken) > 3),
     ("споттер сказал 'слева'", any("слева" in t for t in spoken)),
     ("споттер сказал 'справа'", any("справа" in t for t in spoken)),
-    ("сказал 'чисто' или 'свободен'",
-     any("чисто" in t or "свободен" in t for t in spoken)),
+    ("сказал 'чисто'", any("чисто" in t for t in spoken)),
     ("в тексте нет сырых id", not any("_" in t for t in spoken)),
 ]
 for name, ok in checks:

@@ -24,7 +24,6 @@
 [!] still_there              всё ещё рядом
 [!] clear                    чисто
                              ^ спокойно, с облегчением
-[!] clear_2                  свободен
     hold_line                держи траекторию
     watch_him                следи за ним
     watch_him__hard          следи за этим долбоёбом   (мат)
@@ -517,10 +516,10 @@ iRACING (инциденты)
 СКОЛЬКО ЗАПИСЫВАТЬ
 
   сим                                 файлов  только core
-  F1 25 / F1 24                          339          251
-  Le Mans Ultimate                       362          277
-  Assetto Corsa Competizione             348          265
-  Automobilista 2 / Project CARS 2       356          271
-  iRacing                                364          275
+  F1 25 / F1 24                          338          250
+  Le Mans Ultimate                       361          276
+  Assetto Corsa Competizione             347          264
+  Automobilista 2 / Project CARS 2       355          270
+  iRacing                                363          274
 
-  всё сразу, любой сим                   386          284
+  всё сразу, любой сим                   385          283

@@ -72,7 +72,6 @@ PHRASES: list[Phrase] = [
     Phrase("still_there", "всё ещё рядом", P_SPOTTER, "spotter", core=True),
     Phrase("clear", "чисто", P_SPOTTER, "spotter", core=True,
            note="спокойно, с облегчением"),
-    Phrase("clear_2", "свободен", P_SPOTTER, "spotter", core=True),
     Phrase("hold_line", "держи траекторию", P_SPOTTER, "spotter"),
     Phrase("watch_him", "следи за ним", P_SPOTTER, "spotter",
            hard="следи за этим долбоёбом"),
