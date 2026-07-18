@@ -69,10 +69,12 @@ class FakeLMU:
     def scene(self, rivals, speed=60.0, raining=0.0, phase=S.GamePhase.GREEN,
               in_pits=False, limiter=False, place=3, lap=4, flag=0,
               wear=0.95, flat=False, fuel=50.0, tyre_c=90.0,
-              sector_yellow=False, wheel_off=False):
+              sector_yellow=False, wheel_off=False, time_of_day=14 * 3600,
+              headlights=False, gap_behind=0.0):
         """rivals: (поперёк, вдоль) в метрах. Игрок смотрит вдоль -Z."""
         d = self.layout.data
         sc = d.scoring.scoringInfo
+        sc.mTimeOfDay = float(time_of_day)     # по умолчанию день, 14:00
         sc.mSectorFlag[0] = sc.mSectorFlag[1] = sc.mSectorFlag[2] = 0
         if sector_yellow:
             sc.mSectorFlag[1] = 1      # игрок в mSector=1
@@ -140,6 +142,8 @@ class FakeLMU:
         t.mFilteredThrottle = 1.0
         t.mSpeedLimiterActive = limiter
         t.mEngineWaterTemp = 95.0
+        t.mHeadlights = headlights
+        t.mTimeGapCarBehind = gap_behind
         for j, w in enumerate(t.mWheel):
             k = tyre_c + 273.15
             w.mTemperature[0] = w.mTemperature[1] = w.mTemperature[2] = k

@@ -37,12 +37,42 @@ class GameState:
     # Отвалившиеся колёса. У F1 такого поля нет, там всегда False.
     wheels_detached: tuple[bool, ...] = (False, False, False, False)
     rival_lost_wheel_ahead: bool = False
+    gap_behind_sec: float = 0.0                 # до преследователя, сек (LMU)
+    time_of_day: float = -1.0                   # секунд с полуночи, -1 = нет
+    headlights_on: bool = False
 
     @property
     def my_class(self) -> str:
         if 0 <= self.player_index < len(self.car_classes):
             return self.car_classes[self.player_index]
         return ""
+
+    @property
+    def is_multiclass(self) -> bool:
+        return len({c for c in self.car_classes if c}) > 1
+
+    @property
+    def my_class_position(self) -> int:
+        """Позиция среди машин своего класса.
+
+        mPlace в мультиклассе - общая позиция; GT3-пилот, третий в классе,
+        числится, скажем, пятнадцатым. В зачёте важна классовая.
+        """
+        me = self.me
+        if me is None:
+            return 0
+        if not self.is_multiclass:
+            return me.position
+        my_cls = self.my_class
+        ahead = 0
+        for i, lp in enumerate(self.laps):
+            if i == self.player_index or i >= len(self.car_classes):
+                continue
+            if self.car_classes[i] != my_cls:
+                continue
+            if 0 < lp.position < me.position:
+                ahead += 1
+        return ahead + 1
 
     def update(self, header: Header, payload: object) -> None:
         self.header = header

@@ -149,8 +149,14 @@ class DamageRule:
         self.reported: set[str] = set()
         self.lost_wheel = False
         self.rival_wheel = False
+        self.was_in_pits = False
 
     def update(self, state: GameState, say: Say) -> None:
+        # В боксе повреждения чинят - после выезда докладываем заново.
+        if self.was_in_pits and not state.in_pits:
+            self.on_repair()
+        self.was_in_pits = state.in_pits
+
         # Колесо отвалилось - это конец заезда, важнее любых крыльев.
         detached = any(state.wheels_detached)
         if detached and not self.lost_wheel:
@@ -185,3 +191,4 @@ class DamageRule:
 
     def on_repair(self) -> None:
         self.reported.clear()
+        self.lost_wheel = False

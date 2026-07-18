@@ -54,7 +54,8 @@ class PositionRule:
             return
 
         say("position_gained" if gained else "position_lost")
-        ordinal = numbers.ordinal(pos)
+        # В мультиклассе называем позицию в классе, а не общую.
+        ordinal = numbers.ordinal(state.my_class_position)
         if ordinal:
             say("you_are", *ordinal)
 
@@ -104,6 +105,11 @@ class LapRule:
             say("half_distance")
 
 
+# Преследователь в этом окне - стоит знать, что догоняет. Ближе секунды
+# отдельной фразы нет, а дальше двух - ещё не давит.
+BEHIND_NEAR = 2.0
+
+
 class GapRule:
     def __init__(self) -> None:
         self.cd = Cooldown()
@@ -115,6 +121,13 @@ class GapRule:
             return
         if state.in_pits or me.current_lap < 2:
             return
+
+        # Преследователь сзади (LMU даёт время до него напрямую).
+        behind = state.gap_behind_sec
+        if 1.0 <= behind <= BEHIND_NEAR and me.position > 1:
+            if self.cd.ready("behind", 25):
+                say("gap_behind", *numbers.gap_phrase(behind))
+                return
 
         gap = me.delta_front_ms / 1000.0
 

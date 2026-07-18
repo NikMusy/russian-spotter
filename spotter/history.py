@@ -162,12 +162,19 @@ class SessionTracker:
 
         if self.current is not None:
             # Держим свежими: сессия может оборваться в любой момент.
-            self.current.finish = me.position
+            # В мультиклассе считаем позицию в классе, а не общую.
+            self.current.finish = state.my_class_position
             self.current.laps = max(self.current.laps, me.current_lap)
             self.current.penalties = me.penalties
             self.current.car_class = state.my_class
-            if me.grid_position:
-                self.current.grid = me.grid_position
+            # Старт: в одноклассовой гонке - реальная решётка; в
+            # мультиклассе её из API не вытащить, поэтому фиксируем
+            # классовую позицию с первого кадра как ориентир.
+            if self.current.grid == 0:
+                if state.is_multiclass:
+                    self.current.grid = state.my_class_position
+                elif me.grid_position:
+                    self.current.grid = me.grid_position
             if me.last_lap_ms > 0 and not me.lap_invalid:
                 if (self.current.best_lap_ms == 0
                         or me.last_lap_ms < self.current.best_lap_ms):

@@ -16,6 +16,7 @@ from .rules.classes import ClassPositionRule, ClassTrafficRule
 from .rules.events import (
     EventRule, FlagRule, PenaltyRule, SafetyCarRule,
 )
+from .rules.night import NightRule
 from .rules.proximity import ProximityRule
 from .rules.race import GapRule, LapRule, PositionRule
 from .rules.result import announce as announce_result
@@ -70,7 +71,7 @@ class Engine:
             FlagRule(), SafetyCarRule(), self.penalties,
             PitLimiterRule(), TyreRule(), FuelRule(), DamageRule(),
             WeatherRule(), PositionRule(), LapRule(), GapRule(),
-            ClassTrafficRule(), ClassPositionRule(),
+            ClassTrafficRule(), ClassPositionRule(), NightRule(),
         ]
 
         self._sock: socket.socket | None = None

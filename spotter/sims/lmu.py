@@ -254,6 +254,8 @@ class LMUAdapter:
         state.update(header, self._session(scoring))
 
         # Телеметрия игрока есть не всегда (например, в мониторе).
+        state.time_of_day = float(scoring.mTimeOfDay)
+
         idx = telemetry.playerVehicleIdx
         if telemetry.playerHasVehicle and idx < S.MAX_VEHICLES:
             tele = telemetry.telemInfo[idx]
@@ -264,6 +266,12 @@ class LMUAdapter:
                                           for w in tele.mWheel)
             state.rival_lost_wheel_ahead = self._rival_wheel_off(
                 snap, me.mLapDist, scoring.mLapDist)
+            state.gap_behind_sec = max(0.0, float(tele.mTimeGapCarBehind))
+            state.headlights_on = bool(tele.mHeadlights)
+            # LMU не кладёт валидность круга в scoring - только в телеметрию
+            # игрока. Без этого срезанный круг шёл бы в личный рекорд.
+            if 0 <= player < len(laps):
+                laps[player].lap_invalid = 1 if tele.mLapInvalidated else 0
         return True
 
     def _rival_wheel_off(self, snap, my_dist: float,
