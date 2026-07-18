@@ -400,6 +400,23 @@ PHRASES: list[Phrase] = [
     Phrase("save_the_car", "береги машину, гонка длинная", P_INFO,
            "endurance", core=True, sims=ENDURANCE),
 
+    # ЭНЕРГИЯ ГИБРИДА (WEC гиперкары). Главная фишка радио в WEC.
+    Phrase("energy_ok", "энергии хватает, атакуй", P_INFO, "energy",
+           core=True, sims=(SIM_LMU,)),
+    Phrase("energy_save", "экономь энергию", P_NORMAL, "energy", core=True,
+           sims=(SIM_LMU,), hard="экономь энергию, блядь"),
+    Phrase("energy_low", "виртуальная энергия на исходе", P_NORMAL, "energy",
+           core=True, sims=(SIM_LMU,)),
+    Phrase("energy_critical", "энергии в обрез, дотягивай до бокса", P_URGENT,
+           "energy", core=True, sims=(SIM_LMU,),
+           hard="энергия кончается, блядь, дотягивай"),
+    Phrase("battery_full", "батарея заряжена, полный дэплой", P_INFO,
+           "energy", sims=(SIM_LMU,)),
+    Phrase("battery_low", "батарея разряжена, дэплоя мало", P_NORMAL,
+           "energy", sims=(SIM_LMU,)),
+    Phrase("lift_and_coast", "работай лифт энд кост, береги топливо",
+           P_NORMAL, "energy", sims=ENDURANCE, hard="лифт энд кост, не жги"),
+
     # iRACING: инциденты.
     Phrase("incident", "инцидент засчитан", P_NORMAL, "iracing", core=True,
            sims=(SIM_IRACING,), hard="инцидент, блядь"),
@@ -663,6 +680,7 @@ GROUP_TITLES = {
     "session": "ТИП СЕССИИ",
     "classes": "КЛАССЫ МАШИН",
     "endurance": "ЭНДУРАНС (классы, трафик, ночь)",
+    "energy": "ЭНЕРГИЯ ГИБРИДА (WEC)",
     "iracing": "iRACING (инциденты)",
     "memes": "МЕМЫ",
     "general": "ОБЩЕЕ",

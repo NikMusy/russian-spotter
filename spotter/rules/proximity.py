@@ -25,24 +25,23 @@ def _sane(value: float) -> bool:
 CAR_LENGTH = 5.6
 CAR_WIDTH = 2.0
 
-# Перекрытие вдоль машины: если |вдоль| меньше - машины бок о бок.
-OVERLAP_ENTER = CAR_LENGTH * 1.05    # ~5.9 м
-OVERLAP_EXIT = CAR_LENGTH * 1.40     # ~7.8 м, шире - чтобы не дребезжало
+# Зона "рядом" - прямоугольник вокруг машины: перекрытие вдоль и коридор
+# вбок. Никакого радиуса по прямой: соперник ровно сбоку в 6 м - это борт
+# в борт, и предупредить надо, а радиус его отсекал. Так работает споттер
+# в iRacing/CrewChief - реагирует, как только машина поравнялась.
+#
+# Вдоль берём с запасом (1.3 корпуса): предупреждаем, когда чужой нос
+# только поравнялся с нашим задним крылом, а не когда уже вплотную.
+OVERLAP_ENTER = CAR_LENGTH * 1.3     # ~7.3 м
+OVERLAP_EXIT = CAR_LENGTH * 1.7      # ~9.5 м, шире - чтобы не дребезжало
 
-# Поперёк: ближе MIN - это та же машина/наложение, дальше MAX - другой ряд.
-# 9 метров, как было раньше, - это уже противоположный край трассы:
-# споттер орал про машины, которых рядом нет. Реально бок о бок - это 2-6 м.
-LATERAL_MIN = CAR_WIDTH * 0.62       # ~1.24 м
+# Поперёк: ближе MIN - та же машина/наложение, дальше MAX - другой ряд.
+LATERAL_MIN = CAR_WIDTH * 0.55       # ~1.1 м
 LATERAL_MAX_ENTER = 6.0
 LATERAL_MAX_EXIT = 7.5
 
-# Общее расстояние до соперника: отсекает диагональ, когда он и вбок далеко,
-# и вперёд далеко, но по каждой оси вроде бы проходит. 5 м вбок плюс 5 м
-# вперёд - это 7.1 м по прямой, никакой не "бок о бок".
-NEAR_RADIUS = 6.5
-
 # Дальше этого даже не считаем проекции.
-SCAN_RADIUS = 25.0
+SCAN_RADIUS = 30.0
 # Координаты больше этого - мусор из порванного кадра.
 SANE_COORD = 1e6
 
@@ -52,12 +51,13 @@ MIN_SPEED_KMH = 45
 # Сколько держать "рядом" после пропадания, прежде чем сказать "чисто".
 # С запасом: на битом кадре соперник пропадает на мгновение, и без задержки
 # споттер тараторил бы "чисто - справа - чисто".
-CLEAR_DELAY = 0.7
+CLEAR_DELAY = 0.6
 # Как часто напоминать, что соперник всё ещё рядом. В плотном трафике это
 # главный источник болтовни, поэтому редко.
 STILL_THERE_EVERY = 6.0
-# Минимум времени между сменами стороны - защита от трепыхания.
-MIN_CALL_GAP = 0.45
+# Минимум между сменами стороны - защита от дребезга. Коротко, чтобы
+# переход "слева" -> "с двух сторон" не запаздывал.
+MIN_CALL_GAP = 0.18
 
 CLEAR = "clear"
 LEFT = "left"
@@ -141,7 +141,7 @@ class ProximityRule:
         engaged = self.state != CLEAR
         overlap = OVERLAP_EXIT if engaged else OVERLAP_ENTER
         lat_max = LATERAL_MAX_EXIT if engaged else LATERAL_MAX_ENTER
-        radius = NEAR_RADIUS * (1.25 if engaged else 1.0)
+        scan_sq = SCAN_RADIUS * SCAN_RADIUS
 
         left = right = False
         for i, other in enumerate(state.motion):
@@ -165,16 +165,13 @@ class ProximityRule:
             dz = other.z - me_motion.z
 
             # Быстрый отсев, чтобы не считать проекции для всего поля.
-            gap_sq = dx * dx + dz * dz
-            if gap_sq > SCAN_RADIUS * SCAN_RADIUS:
-                continue
-            # И сразу отсекаем диагональ: далеко и вбок, и вперёд.
-            if gap_sq > radius * radius:
+            if dx * dx + dz * dz > scan_sq:
                 continue
 
             longitudinal = dx * me_motion.fwd_x + dz * me_motion.fwd_z
             lateral = dx * me_motion.right_x + dz * me_motion.right_z
 
+            # Прямоугольная зона: перекрытие вдоль И коридор вбок.
             if abs(longitudinal) > overlap:
                 continue
             dist = abs(lateral)

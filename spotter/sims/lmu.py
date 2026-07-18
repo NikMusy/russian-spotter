@@ -268,6 +268,10 @@ class LMUAdapter:
                 snap, me.mLapDist, scoring.mLapDist)
             state.gap_behind_sec = max(0.0, float(tele.mTimeGapCarBehind))
             state.headlights_on = bool(tele.mHeadlights)
+            # Виртуальная энергия стинта (WEC гиперкары). Поле может
+            # приходить как доля 0..1 или в процентах - нормализуем.
+            ve = float(tele.mVirtualEnergy)
+            state.virtual_energy = ve / 100.0 if ve > 1.5 else ve
             # LMU не кладёт валидность круга в scoring - только в телеметрию
             # игрока. Без этого срезанный круг шёл бы в личный рекорд.
             if 0 <= player < len(laps):

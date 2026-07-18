@@ -183,6 +183,47 @@ r.update(s, lambda *i, **k: None)
 ok(r.best_ms == 100000, "срезанный быстрый круг не стал рекордом", r.best_ms)
 
 print()
+print("ЭНЕРГИЯ ГИБРИДА (WEC)")
+print("-" * 58)
+from spotter.rules.energy import EnergyRule
+
+def st_energy(ve, in_pits=False):
+    s = GameState(sim="lmu")
+    s.player_index = 0
+    s.session = session()
+    s.laps = [lap(position=3, current_lap=5, pit=1 if in_pits else 0)]
+    s.virtual_energy = ve
+    return s
+
+r = EnergyRule()
+said = []
+r.update(st_energy(0.5), lambda *i, **k: said.extend(i))
+ok(said == [], "энергии половина -> молчит", said)
+
+r = EnergyRule()
+said = []
+r.update(st_energy(0.15), lambda *i, **k: said.extend(i))
+ok("energy_low" in said, "энергия 15% -> экономь", said)
+
+r = EnergyRule()
+said = []
+r.update(st_energy(0.05), lambda *i, **k: said.extend(i))
+ok(said == ["energy_critical"], "энергия 5% -> в обрез", said)
+
+r = EnergyRule()
+said = []
+r.update(st_energy(-1.0), lambda *i, **k: said.extend(i))
+ok(said == [], "нет данных (не гиперкар/не LMU) -> молчит", said)
+
+# после пита энергия восполнена - предупреждаем заново
+r = EnergyRule()
+r.update(st_energy(0.05), lambda *i, **k: None)          # предупредил
+r.update(st_energy(0.9, in_pits=True), lambda *i, **k: None)  # пит
+said = []
+r.update(st_energy(0.05), lambda *i, **k: said.extend(i))
+ok("energy_critical" in said, "новый стинт -> предупреждает заново", said)
+
+print()
 print("-" * 58)
 print("ВСЁ ПРОШЛО" if fails == 0 else f"ПРОВАЛОВ: {fails}")
 sys.exit(1 if fails else 0)

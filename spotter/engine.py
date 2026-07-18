@@ -16,6 +16,7 @@ from .rules.classes import ClassPositionRule, ClassTrafficRule
 from .rules.events import (
     EventRule, FlagRule, PenaltyRule, SafetyCarRule,
 )
+from .rules.energy import EnergyRule
 from .rules.night import NightRule
 from .rules.proximity import ProximityRule
 from .rules.race import GapRule, LapRule, PositionRule
@@ -72,6 +73,7 @@ class Engine:
             PitLimiterRule(), TyreRule(), FuelRule(), DamageRule(),
             WeatherRule(), PositionRule(), LapRule(), GapRule(),
             ClassTrafficRule(), ClassPositionRule(), NightRule(),
+            EnergyRule(),
         ]
 
         self._sock: socket.socket | None = None
@@ -208,7 +210,11 @@ class Engine:
                 for rule in self.slow_rules:
                     rule.update(self.state, self.say)
 
-            time.sleep(1 / 60)
+            # 100 Гц: споттер должен реагировать на "слева/справа" так же
+            # резко, как в iRacing. LMU обновляет память чаще 60 раз в сек,
+            # и на 60 Гц мы теряли кадр - до полутора десятков миллисекунд
+            # задержки на пустом месте.
+            time.sleep(1 / 100)
 
         adapter.close()
 

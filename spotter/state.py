@@ -40,6 +40,8 @@ class GameState:
     gap_behind_sec: float = 0.0                 # до преследователя, сек (LMU)
     time_of_day: float = -1.0                   # секунд с полуночи, -1 = нет
     headlights_on: bool = False
+    # Виртуальная энергия стинта в WEC (гиперкары), доля 0..1. -1 = нет.
+    virtual_energy: float = -1.0
 
     @property
     def my_class(self) -> str:

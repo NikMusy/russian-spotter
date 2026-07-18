@@ -70,7 +70,7 @@ class FakeLMU:
               in_pits=False, limiter=False, place=3, lap=4, flag=0,
               wear=0.95, flat=False, fuel=50.0, tyre_c=90.0,
               sector_yellow=False, wheel_off=False, time_of_day=14 * 3600,
-              headlights=False, gap_behind=0.0):
+              headlights=False, gap_behind=0.0, virtual_energy=1.0):
         """rivals: (поперёк, вдоль) в метрах. Игрок смотрит вдоль -Z."""
         d = self.layout.data
         sc = d.scoring.scoringInfo
@@ -144,6 +144,7 @@ class FakeLMU:
         t.mEngineWaterTemp = 95.0
         t.mHeadlights = headlights
         t.mTimeGapCarBehind = gap_behind
+        t.mVirtualEnergy = virtual_energy
         for j, w in enumerate(t.mWheel):
             k = tyre_c + 273.15
             w.mTemperature[0] = w.mTemperature[1] = w.mTemperature[2] = k

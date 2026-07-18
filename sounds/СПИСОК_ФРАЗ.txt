@@ -446,6 +446,19 @@ DRS
     slow_zone                медленная зона впереди   (сим: lmu)
 [!] save_the_car             береги машину, гонка длинная   (сим: lmu, acc, iracing, ams2)
 
+ЭНЕРГИЯ ГИБРИДА (WEC)
+----------------------------------------------------------------------
+[!] energy_ok                энергии хватает, атакуй   (сим: lmu)
+[!] energy_save              экономь энергию   (сим: lmu)
+    energy_save__hard        экономь энергию, блядь   (мат)
+[!] energy_low               виртуальная энергия на исходе   (сим: lmu)
+[!] energy_critical          энергии в обрез, дотягивай до бокса   (сим: lmu)
+    energy_critical__hard    энергия кончается, блядь, дотягивай   (мат)
+    battery_full             батарея заряжена, полный дэплой   (сим: lmu)
+    battery_low              батарея разряжена, дэплоя мало   (сим: lmu)
+    lift_and_coast           работай лифт энд кост, береги топливо   (сим: lmu, acc, iracing, ams2)
+    lift_and_coast__hard     лифт энд кост, не жги   (мат)
+
 iRACING (инциденты)
 ----------------------------------------------------------------------
 [!] incident                 инцидент засчитан   (сим: iracing)
@@ -522,9 +535,9 @@ iRACING (инциденты)
 
   сим                                 файлов  только core
   F1 25 / F1 24                          338          250
-  Le Mans Ultimate                       363          278
-  Assetto Corsa Competizione             349          266
-  Automobilista 2 / Project CARS 2       358          273
-  iRacing                                365          276
+  Le Mans Ultimate                       373          284
+  Assetto Corsa Competizione             351          266
+  Automobilista 2 / Project CARS 2       360          273
+  iRacing                                367          276
 
-  всё сразу, любой сим                   388          286
+  всё сразу, любой сим                   398          292
