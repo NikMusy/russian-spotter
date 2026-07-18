@@ -75,10 +75,12 @@ def decimal(value: float, feminine: bool = False) -> list[str]:
         whole += 1
         tenth = 0
 
-    # У дробного в женском роде склоняется только целая часть: "две и пять".
     ids = integer(whole, feminine=feminine)
     if tenth > 0:
-        ids.extend(("point", f"num_{tenth}"))
+        # И целая, и десятая доля женского рода: "одиннадцать и две".
+        tenth_id = FEMININE[tenth] if feminine and tenth in FEMININE \
+            else f"num_{tenth}"
+        ids.extend(("point", tenth_id))
     return ids
 
 
@@ -96,10 +98,22 @@ def with_word(value: float, word: str, decimals: bool = False) -> list[str]:
 
     if decimals and tenth > 0:
         ids = decimal(value, feminine=feminine)
-        return ids + [FORMS[word][1]]
+        return ids + [FORMS[word][1]]      # дробь всегда как "2-4": секунды
 
     ids = integer(whole, feminine=feminine)
     return ids + [plural_form(whole, word)]
+
+
+def gap_phrase(value: float) -> list[str]:
+    """Отрыв в секундах для радио.
+
+    Меньше секунды не произносим числом - там уже слипстрим или DRS, а
+    "ноль и восемь секунды" звучит коряво. Целые доли не тараторим:
+    3.0 -> "три секунды", а не "три и ноль".
+    """
+    if value < 1.0:
+        return []
+    return with_word(value, "seconds", decimals=True)
 
 
 def ordinal(n: int) -> list[str]:

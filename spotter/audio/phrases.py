@@ -630,7 +630,8 @@ MEME_FOR: dict[str, tuple[str, ...]] = {
     "track_wet_line": ("meme_boat",),
     "weather_rain_heavy": ("meme_boat",),
     "push_now": ("meme_pedal", "meme_get_in_there"),
-    "focus": ("meme_not_raikkonen", "meme_kimi"),
+    # focus говорит SpinRule при развороте - мемы подобраны под это.
+    "focus": ("meme_not_raikkonen", "meme_valenok"),
     "warning_track_limits": ("meme_valenok",),
     "box_this_lap": ("meme_box_meme",),
     "good_race": ("meme_champion",),

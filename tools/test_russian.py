@@ -130,6 +130,29 @@ for entry, want in [
         print(f"       ждали: {want}")
 
 print()
+print("ОТРЫВ НА РАДИО (gap_phrase)")
+print("-" * 58)
+GAPS = [
+    (0.3, ""),                                  # меньше секунды - молчит
+    (0.9, ""),
+    (1.0, "одна секунда"),
+    (1.5, "одна и пять секунды"),
+    (2.2, "две и две секунды"),                 # десятая тоже женская
+    (11.2, "одиннадцать и две секунды"),
+    (3.0, "три секунды"),
+    (5.0, "пять секунд"),
+]
+for value, want in GAPS:
+    ids = numbers.gap_phrase(value)
+    got = say(ids)
+    ok = got == want
+    fails += not ok
+    shown = got if got else "(молчит)"
+    print(f"  {'OK  ' if ok else 'FAIL'} {value:>5.1f} -> {shown}")
+    if not ok:
+        print(f"       ждали: {want or '(молчит)'}")
+
+print()
 print("ВСЕ ФРАЗЫ СУЩЕСТВУЮТ В БАНКЕ")
 print("-" * 58)
 need = set()

@@ -136,10 +136,10 @@ class GapRule:
                 return
             self.told_drs = False
 
-        if me.position == 1 or gap <= 0 or gap > GAP_MAX:
+        if me.position == 1 or gap < 1.0 or gap > GAP_MAX:
             return
         if not self.cd.ready("gap", GAP_EVERY):
             return
 
-        # with_word сам подберёт падеж: одна секунда, две и пять секунды.
-        say("gap_ahead", *numbers.with_word(gap, "seconds", decimals=True))
+        # gap_phrase молчит на отрыве меньше секунды - там слипстрим/DRS.
+        say("gap_ahead", *numbers.gap_phrase(gap))

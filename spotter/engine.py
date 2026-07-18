@@ -19,6 +19,7 @@ from .rules.events import (
 from .rules.proximity import ProximityRule
 from .rules.race import GapRule, LapRule, PositionRule
 from .rules.result import announce as announce_result
+from .rules.spin import SpinRule
 from .rules.track import TrackAnnounceRule
 from .rules.weather import WeatherRule
 from .state import GameState
@@ -59,6 +60,9 @@ class Engine:
         self.player.prewarm()
 
         self.proximity = ProximityRule()
+        # Разворот ловим на каждом кадре движения: на 5 Гц быстрый спин
+        # успевает намотать больше пол-оборота, и рывок угла теряется.
+        self.spin = SpinRule()
         self.penalties = PenaltyRule()
         self.events = EventRule(penalties=self.penalties)
         self.slow_rules = [
@@ -196,6 +200,7 @@ class Engine:
 
             self._packets += 1
             self.proximity.update(self.state, self.say)
+            self.spin.update(self.state, self.say)
 
             if now - self._last_slow >= SLOW_RULES_EVERY:
                 self._last_slow = now
@@ -231,6 +236,7 @@ class Engine:
         # Споттер - на каждом кадре движения, иначе он опоздает.
         if header.packet_id == PacketId.MOTION:
             self.proximity.update(self.state, self.say)
+            self.spin.update(self.state, self.say)
 
         now = time.monotonic()
         if now - self._last_slow >= SLOW_RULES_EVERY:
