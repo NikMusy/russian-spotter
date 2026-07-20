@@ -404,12 +404,12 @@ class LMUAdapter:
         * mIndividualPhase - фаза конкретной машины, 10 = идёт под жёлтым,
           11 = под синим. Самый точный сигнал, раньше не использовался;
         * mFlag - в заголовке сказано "только 0=зелёный или 6=синий";
-        * mSectorFlag - локальные жёлтые по секторам. В заголовке честно
-          написано, что порядок секторов авторы сами не помнят ("not sure
-          if sector 0 is first or last"), поэтому привязываться к своему
-          сектору нельзя: раньше из-за этого индекс уезжал на единицу и
-          жёлтый молчал. Берём флаг, если он поднят хоть где-то;
         * mYellowFlagState / mUnderYellow - полная жёлтая по трассе.
+
+        mSectorFlag намеренно НЕ используется. На живой игре в нём стоит
+        11 во всех трёх секторах при полностью зелёной трассе - то есть
+        это не булев признак локальной жёлтой, что бы ни говорил
+        заголовок. Пока считали его флагом, споттер видел вечный жёлтый.
         """
         if scoring.mGamePhase == S.GamePhase.STOPPED:
             return Flag.RED
@@ -423,9 +423,7 @@ class LMUAdapter:
             return Flag.YELLOW
 
         self.yellow_is_mine = False
-        if any(scoring.mSectorFlag[i] for i in range(3)):
-            return Flag.YELLOW
-        if scoring.mYellowFlagState > S.YellowState.NONE:
+        if S.YellowState.NONE < scoring.mYellowFlagState <= S.YellowState.RACE_HALT:
             return Flag.YELLOW
         return Flag.GREEN
 

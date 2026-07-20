@@ -41,10 +41,12 @@ print("-" * 58)
 CASES = [
     ("чисто -> зелёный", veh(), scoring(), Flag.GREEN),
     ("синий флаг", veh(flag=S.VehFlag.BLUE), scoring(), Flag.BLUE),
-    ("локальная жёлтая где-то на трассе",
-     veh(sector=1), scoring(sector_flags=(0, 1, 0)), Flag.YELLOW),
-    ("локальная жёлтая в другом секторе - тоже жёлтый",
-     veh(sector=1), scoring(sector_flags=(1, 0, 0)), Flag.YELLOW),
+    # На живой игре mSectorFlag стоит 11 при зелёной трассе - это не
+    # булев признак, и полагаться на него нельзя.
+    ("mSectorFlag не считается флагом (на живой игре там мусор)",
+     veh(sector=1), scoring(sector_flags=(11, 11, 11)), Flag.GREEN),
+    ("mSectorFlag с любыми значениями - всё равно зелёный",
+     veh(sector=1), scoring(sector_flags=(2, 2, 3)), Flag.GREEN),
     ("машина под жёлтым (mIndividualPhase=10)",
      veh(phase=10), scoring(), Flag.YELLOW),
     ("машина под синим (mIndividualPhase=11)",
@@ -55,9 +57,8 @@ CASES = [
      veh(), scoring(yellow_state=S.YellowState.PENDING), Flag.YELLOW),
     ("сессия остановлена -> красный",
      veh(), scoring(phase=S.GamePhase.STOPPED), Flag.RED),
-    ("синий важнее жёлтого в секторе",
-     veh(sector=1, flag=S.VehFlag.BLUE), scoring(sector_flags=(0, 1, 0)),
-     Flag.BLUE),
+    ("синий важнее жёлтой по трассе",
+     veh(sector=1, flag=S.VehFlag.BLUE), scoring(yellow_state=1), Flag.BLUE),
 ]
 for name, v, s, want in CASES:
     got = a._flag(v, s)

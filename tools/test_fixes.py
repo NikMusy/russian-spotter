@@ -224,6 +224,46 @@ r.update(st_energy(0.05), lambda *i, **k: said.extend(i))
 ok("energy_critical" in said, "новый стинт -> предупреждает заново", said)
 
 print()
+print("ДАННЫХ НЕТ - НЕ ВЫДУМЫВАЕМ (баги с живой игры)")
+print("-" * 58)
+from spotter.rules.car import TyreRule
+from spotter.udp.packets import Telemetry
+
+
+def st_tyres(temps):
+    s = GameState(sim="lmu")
+    s.player_index = 0
+    s.laps = [lap()]
+    s.telemetry = Telemetry(speed=120, throttle=1.0, steer=0.0, brake=0.0,
+                            gear=4, rpm=8000, drs=0, brake_temp=(0,) * 4,
+                            tyre_surface_temp=temps, tyre_inner_temp=temps,
+                            engine_temp=90, tyre_pressure=(23.0,) * 4,
+                            surface_type=(0,) * 4)
+    return s
+
+r = TyreRule()
+said = []
+r.update(st_tyres((-273, -273, -273, -273)), lambda *i, **k: said.extend(i))
+ok(said == [], "шины -273 C (данных нет) -> не требует греть", said)
+
+r = TyreRule()
+said = []
+r.update(st_tyres((50, 50, 50, 50)), lambda *i, **k: said.extend(i))
+ok(said == ["warm_tyres"], "шины реально холодные 50 C -> грей", said)
+
+# энергия: ноль = машина без гибрида, а не пустой бак
+r = EnergyRule()
+said = []
+r.update(st_energy(0.0), lambda *i, **k: said.extend(i))
+ok(said == [], "энергия 0.0 (LMP3, гибрида нет) -> молчит", said)
+
+r = EnergyRule()
+said = []
+r.update(st_energy(0.05), lambda *i, **k: said.extend(i))
+ok(said == ["energy_critical"], "энергия 5% у гиперкара -> предупреждает",
+   said)
+
+print()
 print("-" * 58)
 print("ВСЁ ПРОШЛО" if fails == 0 else f"ПРОВАЛОВ: {fails}")
 sys.exit(1 if fails else 0)

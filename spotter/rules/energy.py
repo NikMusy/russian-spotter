@@ -32,8 +32,10 @@ class EnergyRule:
         self.was_in_pits = state.in_pits
 
         ve = state.virtual_energy
-        # -1 = сим не отдаёт энергию (не гиперкар, не WEC, не LMU).
-        if ve < 0 or not state.on_track or state.in_pits:
+        # Ровно ноль - это "машина без гибрида" (LMP3, GT3) или данных нет.
+        # У настоящего гиперкара энергия по нулям не ездит: он бы уже стоял.
+        # Без этой проверки споттер орал про пустую энергию всю гонку.
+        if ve <= 0.0 or not state.on_track or state.in_pits:
             return
         if not state.in_race:
             return

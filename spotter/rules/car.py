@@ -53,6 +53,8 @@ COLD_GAP = 50.0
 # Перегрев - вещь временная (пара кругов атаки), но повторять тоже незачем.
 MAX_HOT_CALLS = 3
 HOT_GAP = 45.0
+# Ниже этого - сим просто не отдаёт температуру (нули Кельвина).
+NO_DATA_C = -50
 
 
 class TyreRule:
@@ -91,6 +93,11 @@ class TyreRule:
             return
         temps = state.telemetry.tyre_surface_temp
         avg = sum(temps) / len(temps)
+        # В боксе и на загрузке сим отдаёт нули Кельвина, из которых
+        # получается -273 C. Это "данных нет", а не "шины холодные" -
+        # иначе споттер требует греть резину прямо в гараже.
+        if avg < NO_DATA_C:
+            return
 
         if avg < 70 and state.speed_kmh > 60:
             if self.cold_calls < MAX_COLD_CALLS and self.cd.ready("cold", COLD_GAP):
