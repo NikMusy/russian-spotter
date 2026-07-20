@@ -88,7 +88,10 @@ class FlagRule:
 
         if flag == Flag.YELLOW:
             if self.cd.ready("yellow", 8):
-                say("flag_yellow_sector")
+                # Про "твой сектор" говорим, только когда сим это
+                # подтверждает; иначе просто "жёлтый флаг".
+                say("flag_yellow_sector" if state.yellow_is_mine
+                    else "flag_yellow")
         elif flag == Flag.BLUE:
             if self.cd.ready("blue", 12):
                 say("flag_blue")

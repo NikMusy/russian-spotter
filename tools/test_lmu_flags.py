@@ -18,11 +18,12 @@ fails = 0
 a = LMUAdapter()
 
 
-def veh(sector=1, flag=0, under_yellow=False):
+def veh(sector=1, flag=0, under_yellow=False, phase=0):
     v = S.VehicleScoringInfoV01()
     v.mSector = sector
     v.mFlag = flag
     v.mUnderYellow = under_yellow
+    v.mIndividualPhase = phase
     return v
 
 
@@ -40,10 +41,14 @@ print("-" * 58)
 CASES = [
     ("чисто -> зелёный", veh(), scoring(), Flag.GREEN),
     ("синий флаг", veh(flag=S.VehFlag.BLUE), scoring(), Flag.BLUE),
-    ("жёлтый в СЕКТОРЕ игрока (mSector=1)",
+    ("локальная жёлтая где-то на трассе",
      veh(sector=1), scoring(sector_flags=(0, 1, 0)), Flag.YELLOW),
-    ("жёлтый в ДРУГОМ секторе - нам зелёный",
-     veh(sector=1), scoring(sector_flags=(1, 0, 0)), Flag.GREEN),
+    ("локальная жёлтая в другом секторе - тоже жёлтый",
+     veh(sector=1), scoring(sector_flags=(1, 0, 0)), Flag.YELLOW),
+    ("машина под жёлтым (mIndividualPhase=10)",
+     veh(phase=10), scoring(), Flag.YELLOW),
+    ("машина под синим (mIndividualPhase=11)",
+     veh(phase=11), scoring(), Flag.BLUE),
     ("полная жёлтая (mUnderYellow)",
      veh(under_yellow=True), scoring(), Flag.YELLOW),
     ("жёлтая в scoring.mYellowFlagState",
@@ -60,6 +65,39 @@ for name, v, s, want in CASES:
     fails += not ok
     names = {0: "зелёный", 2: "синий", 3: "жёлтый", 4: "красный"}
     print(f"  {'OK  ' if ok else 'FAIL'} {name:<40} -> {names.get(got, got)}")
+
+print()
+print("КАКУЮ ФРАЗУ ВЫБИРАЕТ FlagRule")
+print("-" * 58)
+from _fixtures import lap
+from spotter.rules.events import FlagRule
+from spotter.state import GameState
+from spotter.udp.packets import CarStatus
+
+
+def st_flag(flag_value, mine):
+    s = GameState(sim="lmu")
+    s.player_index = 0
+    s.laps = [lap()]
+    s.yellow_is_mine = mine
+    s.status = CarStatus(fuel_mix=1, pit_limiter=0, fuel_in_tank=50,
+                         fuel_capacity=100, fuel_remaining_laps=10,
+                         drs_allowed=0, drs_activation_distance=0,
+                         actual_tyre_compound=0, visual_tyre_compound=0,
+                         tyres_age_laps=0, fia_flag=flag_value,
+                         ers_store=0.0, ers_deploy_mode=0)
+    return s
+
+
+for mine, want in ((True, "flag_yellow_sector"), (False, "flag_yellow")):
+    r = FlagRule()
+    r.update(st_flag(Flag.GREEN, mine), lambda *i, **k: None)   # первый кадр
+    said = []
+    r.update(st_flag(Flag.YELLOW, mine), lambda *i, **k: said.extend(i))
+    got = said[0] if said else None
+    label = "жёлтый на нашем участке" if mine else "жёлтый где-то на трассе"
+    fails += got != want
+    print(f"  {'OK  ' if got == want else 'FAIL'} {label:<32} -> {got}")
 
 print()
 print("ОТВАЛИВШЕЕСЯ КОЛЕСО (правило)")

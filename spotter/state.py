@@ -42,6 +42,11 @@ class GameState:
     headlights_on: bool = False
     # Виртуальная энергия стинта в WEC (гиперкары), доля 0..1. -1 = нет.
     virtual_energy: float = -1.0
+    # Скорость каждой машины, км/ч - по ней видно вставшего на трассе.
+    car_speeds: list[float] = field(default_factory=list)
+    # Жёлтый именно на нашем участке (а не где-то на трассе). Порядок
+    # секторов LMU наружу не гарантирует, поэтому различаем явно.
+    yellow_is_mine: bool = False
 
     @property
     def my_class(self) -> str:

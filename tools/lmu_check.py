@@ -57,6 +57,26 @@ print(f"  круг трассы    : {s.mLapDist:.0f} м")
 print(f"  макс. кругов   : {s.mMaxLaps}")
 print()
 
+print("--- ФЛАГИ (что реально отдаёт игра) ---")
+_pl = None
+for i in range(min(s.mNumVehicles, S.MAX_VEHICLES)):
+    if snap.data.scoring.vehScoringInfo[i].mIsPlayer:
+        _pl = snap.data.scoring.vehScoringInfo[i]
+        break
+print(f"  mYellowFlagState : {s.mYellowFlagState}   (полная жёлтая, -1..7)")
+print(f"  mSectorFlag      : {[s.mSectorFlag[i] for i in range(3)]}"
+      f"   (локальные жёлтые по секторам)")
+print(f"  mGamePhase       : {s.mGamePhase}   (7 = сессия остановлена)")
+if _pl is not None:
+    print(f"  mFlag            : {_pl.mFlag}   (0=зелёный, 6=синий)")
+    print(f"  mUnderYellow     : {_pl.mUnderYellow}")
+    print(f"  mIndividualPhase : {_pl.mIndividualPhase}"
+          f"   (10=под жёлтым, 11=под синим)")
+    print(f"  mSector          : {_pl.mSector}   (0=третий, 1=первый, 2=второй)")
+print("  Если во время жёлтой тут везде нули - игра эти поля не")
+print("  заполняет, и флаги брать неоткуда. Пришли этот вывод.")
+print()
+
 print("--- погода ---")
 print(f"  дождь          : {s.mRaining:.2f}")
 print(f"  трасса         : {s.mTrackTemp:.1f} C")

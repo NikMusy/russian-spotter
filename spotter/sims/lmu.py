@@ -184,6 +184,8 @@ class LMUAdapter:
         self.reader = LMUReader()
         self.frame = 0
         self.last_class: int = S.VehicleClass.UNKNOWN
+        # Жёлтый на нашем участке или где-то на трассе - решается в _flag.
+        self.yellow_is_mine = False
 
     def open(self) -> bool:
         return self.reader.open()
@@ -248,6 +250,8 @@ class LMUAdapter:
             vehicles[i].mVehicleClass.decode("utf-8", "replace")
             for i in range(count)
         ]
+        state.car_speeds = [_speed_kmh(vehicles[i].mLocalVel)
+                            for i in range(count)]
 
         state.update(header, motion)
         state.update(header, laps)
@@ -261,6 +265,7 @@ class LMUAdapter:
             tele = telemetry.telemInfo[idx]
             state.update(header, self._telemetry(tele))
             state.update(header, self._status(tele, vehicles[player], scoring))
+            state.yellow_is_mine = self.yellow_is_mine
             state.update(header, self._damage(tele))
             state.wheels_detached = tuple(bool(w.mDetached)
                                           for w in tele.mWheel)
@@ -393,22 +398,34 @@ class LMUAdapter:
               scoring: S.ScoringInfoV01) -> int:
         """Какой флаг показывают лично нам.
 
-        mUnderYellow - это только полная жёлтая, взятая на старт-финише.
-        Локальные жёлтые лежат отдельно, в mSectorFlag, и без них споттер
-        молчал про жёлтый в секторе.
+        LMU раскладывает флаги по нескольким полям, и надёжного одного
+        нет - поэтому смотрим все:
+
+        * mIndividualPhase - фаза конкретной машины, 10 = идёт под жёлтым,
+          11 = под синим. Самый точный сигнал, раньше не использовался;
+        * mFlag - в заголовке сказано "только 0=зелёный или 6=синий";
+        * mSectorFlag - локальные жёлтые по секторам. В заголовке честно
+          написано, что порядок секторов авторы сами не помнят ("not sure
+          if sector 0 is first or last"), поэтому привязываться к своему
+          сектору нельзя: раньше из-за этого индекс уезжал на единицу и
+          жёлтый молчал. Берём флаг, если он поднят хоть где-то;
+        * mYellowFlagState / mUnderYellow - полная жёлтая по трассе.
         """
         if scoring.mGamePhase == S.GamePhase.STOPPED:
             return Flag.RED
-        if v.mFlag == S.VehFlag.BLUE:
-            return Flag.BLUE
 
-        # mSector: 0=третий, 1=первый, 2=второй. В заголовке честно
-        # написано, что порядок в mSectorFlag они сами не помнят, поэтому
-        # берём тот же индекс - он совпадает в обе стороны.
-        sector = v.mSector
-        if 0 <= sector < 3 and scoring.mSectorFlag[sector]:
+        phase = v.mIndividualPhase
+        if phase == 11 or v.mFlag == S.VehFlag.BLUE:
+            return Flag.BLUE
+        # Под жёлтым именно мы - можно сказать "в твоём секторе".
+        if phase == 10 or v.mUnderYellow:
+            self.yellow_is_mine = True
             return Flag.YELLOW
-        if v.mUnderYellow or scoring.mYellowFlagState > S.YellowState.NONE:
+
+        self.yellow_is_mine = False
+        if any(scoring.mSectorFlag[i] for i in range(3)):
+            return Flag.YELLOW
+        if scoring.mYellowFlagState > S.YellowState.NONE:
             return Flag.YELLOW
         return Flag.GREEN
 

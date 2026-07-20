@@ -16,7 +16,9 @@ from .rules.classes import ClassPositionRule, ClassTrafficRule
 from .rules.events import (
     EventRule, FlagRule, PenaltyRule, SafetyCarRule,
 )
+from .rules.clock import SessionClockRule
 from .rules.energy import EnergyRule
+from .rules.incidents import IncidentRule, LappedCarRule
 from .rules.night import NightRule
 from .rules.proximity import ProximityRule
 from .rules.race import GapRule, LapRule, PositionRule
@@ -73,7 +75,8 @@ class Engine:
             PitLimiterRule(), TyreRule(), FuelRule(), DamageRule(),
             WeatherRule(), PositionRule(), LapRule(), GapRule(),
             ClassTrafficRule(), ClassPositionRule(), NightRule(),
-            EnergyRule(),
+            EnergyRule(), IncidentRule(), LappedCarRule(),
+            SessionClockRule(),
         ]
 
         self._sock: socket.socket | None = None

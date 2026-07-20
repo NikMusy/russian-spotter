@@ -42,6 +42,15 @@
     flag_chequered           клетчатый флаг
 [!] incident_ahead           авария впереди
     incident_ahead__hard     авария впереди, блядь, аккуратно   (мат)
+[!] slow_car_ahead           медленная машина впереди
+    slow_car_ahead__hard     медленный впереди, объезжай   (мат)
+[!] car_stopped_ahead        машина стоит на трассе
+    car_stopped_ahead__hard  машина стоит на трассе, блядь, аккуратно   (мат)
+[!] spin_ahead               впереди развернуло
+    spin_ahead__hard         впереди развернуло, тормози   (мат)
+    debris_ahead             обломки на трассе
+    debris_ahead__hard       обломки на трассе, объезжай   (мат)
+    off_track_ahead          впереди вылетели с трассы
 
 МАШИНА БЕЗОПАСНОСТИ
 ----------------------------------------------------------------------
@@ -303,6 +312,11 @@
 [!] last_lap                 последний круг
 [!] laps_remaining           осталось кругов
     half_distance            половина дистанции
+[!] time_left                до конца осталось
+                             ^ дальше число и слово минут
+[!] hour_to_go               остался час гонки
+    final_minutes            последние минуты, дотерпи
+    final_minutes__hard      последние минуты, блядь, дотерпи   (мат)
 [!] fastest_lap              быстрейший круг гонки
     fastest_lap__hard        быстрейший круг, охуенно   (мат)
 [!] personal_best            личный рекорд
@@ -534,10 +548,10 @@ iRACING (инциденты)
 СКОЛЬКО ЗАПИСЫВАТЬ
 
   сим                                 файлов  только core
-  F1 25 / F1 24                          338          250
-  Le Mans Ultimate                       373          284
-  Assetto Corsa Competizione             351          266
-  Automobilista 2 / Project CARS 2       360          273
-  iRacing                                367          276
+  F1 25 / F1 24                          351          258
+  Le Mans Ultimate                       386          292
+  Assetto Corsa Competizione             364          274
+  Automobilista 2 / Project CARS 2       373          281
+  iRacing                                380          284
 
-  всё сразу, любой сим                   398          292
+  всё сразу, любой сим                   411          300
